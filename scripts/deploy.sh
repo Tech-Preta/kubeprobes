@@ -1,5 +1,5 @@
 # Build the Docker image
-docker build -t kubeprobes .
+docker build -t nataliagranato/kubeprobes:0.1.0 .
 
 # Push the Docker image to a registry
 docker push nataliagranato/kubeprobes:0.1.0
