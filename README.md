@@ -2,6 +2,19 @@
 
 Probes é uma ferramenta de linha de comando (CLI) desenvolvida em Go para escanear workloads do Kubernetes em busca de probes (sondas) definidas.
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI
+    participant K8sAPI
+
+    User->>CLI: kubeprobes scan -k <kubeconfig> -c <context> -n <namespace> -p <probe> -r
+    CLI->>K8sAPI: Fetch workloads in namespace
+    K8sAPI-->>CLI: Return workload details
+    CLI->>CLI: Scan for specified probes
+    CLI->>User: Display scan results and recommendations
+```
+
 ## Requisitos
 
 - Go 1.13 ou superior
