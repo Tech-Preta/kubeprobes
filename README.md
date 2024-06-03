@@ -1,4 +1,4 @@
-# Probes - CLI Tool for Scanning Kubernetes Probes
+# KubeProbes - CLI Tool for Scanning Kubernetes Probes
 
 Probes é uma ferramenta de linha de comando (CLI) desenvolvida em Go para escanear workloads do Kubernetes em busca de probes (sondas) definidas.
 
