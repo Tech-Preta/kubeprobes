@@ -1,7 +1,11 @@
 # Use the official Golang image to create a build artifact.
 # This is based on Debian and sets the GOPATH to /go.
+<<<<<<< HEAD
+FROM golang:1.23.1 as builder
+=======
 FROM FROM golang:1.23.1 as builder
 
+>>>>>>> main
 
 # Copy local code to the container image.
 WORKDIR /go/src/projeto
