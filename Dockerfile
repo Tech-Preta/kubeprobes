@@ -1,7 +1,7 @@
 # Use the official Golang image to create a build artifact.
 # This is based on Debian and sets the GOPATH to /go.
 <<<<<<< HEAD
-FROM golang:1.24rc2 as builder
+FROM golang:1.24.1 as builder
 =======
 FROM FROM golang:1.23.1 as builder
 
@@ -16,7 +16,7 @@ RUN go get -d -v ./...
 RUN go install -v ./...
 
 # Use a Docker multi-stage build to create a lean production image.
-FROM golang:1.24rc2
+FROM golang:1.24.1
 COPY --from=builder /go/bin/projeto /projeto
 
 # Run the web service on container startup.
