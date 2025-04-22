@@ -1,0 +1,26 @@
+name: Resposta Automática a Issues
+
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: read
+  issues: write  
+  
+jobs:
+  resposta-automatica:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
+    - uses: derekprior/add-autoresponse@500f8788d667c31d43a4469f8a3ec3b491470fd1 # master
+      env:
+        GITHUB_TOKEN: ${{ secrets.USER_TOKEN }}
+      with:
+        respondableId: ${{ github.event.issue.node_id }}
+        response: "Obrigado @${{ github.event.issue.user.login }} por criar esta issue. Se esta issue é sobre um bug, pergunta sobre o produto ou solicitação de funcionalidade: você pode me enviar um e-mail para contato@nataliagranato.xyz"
+        author: ${{ github.event.issue.user.login }}
