@@ -1,0 +1,50 @@
+name: Checkov Security Scan
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'    
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened  
+  workflow_dispatch: 
+
+permissions:
+  contents: read
+  security-events: write # Permissão necessária para upload de SARIF
+
+jobs:
+  checkov-scan:
+    name: Checkov Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      # Run Checkov with SARIF output
+      - name: Run Checkov and generate SARIF report
+        run: |
+          checkov -d ./ \
+            -o sarif \
+            --output-file checkov-results.sarif \
+            --quiet
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov-results.sarif
+
+      - name: Show Checkov results (verbose)
+        run: checkov -d ./
