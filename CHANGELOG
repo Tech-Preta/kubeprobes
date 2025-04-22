@@ -23,4 +23,9 @@ straightforward as possible.
 ## [1.0.0] - 2025-04-22
 
 ### Added
-- Esse é apenas um exemplo de descrição.
+- Primeira versão pública da ferramenta **KubeProbes**.
+- Implementação de suporte para escanear workloads do Kubernetes e identificar **probes** (liveness e readiness) configuradas.
+- CLI desenvolvida em **Go**, com comandos intuitivos para análise de clusters Kubernetes.
+- Geração de relatórios detalhados com os resultados do escaneamento.
+- Validação de configuração das **probes**, indicando possíveis problemas ou melhorias.
+- Suporte inicial para execução em ambientes com Docker.
