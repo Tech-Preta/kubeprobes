@@ -1,24 +1,28 @@
-    name: Generate SBOM
-    on:
-      push:
-        branches:
-        - main
-    
+name: Generate SBOM
+on:
+  push:
+    branches:
+    - main
+
+# Define permissões mínimas no nível do workflow
+permissions:
+  contents: read
+
+jobs:
+  generate-sbom:
+    runs-on: ubuntu-latest
+    # Define permissões específicas para este job
     permissions:
-      contents: write
-    
-    jobs:
-      generate-sbom:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-    
-          - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
-            uses: aquasecurity/trivy-action@0.30.0
-            with:
-              scan-type: 'fs'
-              format: 'github'
-              output: 'dependency-results.sbom.json'
-              image-ref: '.'
-              github-pat: ${{ secrets.USER_TOKEN }} 
+      contents: write # Permissão necessária para gerar e enviar o SBOM
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.USER_TOKEN }} 

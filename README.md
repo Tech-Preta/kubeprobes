@@ -1,6 +1,61 @@
-# KubeProbes - CLI Tool for Scanning Kubernetes Probes
+# Kubeprobes
 
-Probes é uma ferramenta de linha de comando (CLI) desenvolvida em Go para escanear workloads do Kubernetes em busca de probes (sondas) definidas.
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/XXXX/badge)](https://www.bestpractices.dev/projects/XXXX)
+
+Uma ferramenta CLI para verificar probes do Kubernetes em seus workloads.
+
+## Funcionalidades
+
+- Verifica liveness, readiness e startup probes
+- Suporta múltiplos namespaces
+- Fornece recomendações de configuração
+- Integração com diferentes contextos do Kubernetes
+
+## Instalação
+
+### Binários Pré-compilados
+
+Baixe o binário apropriado para seu sistema da [página de releases](https://github.com/nataliagranato/kubeprobes/releases).
+
+### Compilando do Código Fonte
+
+```bash
+git clone https://github.com/nataliagranato/kubeprobes.git
+cd kubeprobes/src
+go build -o kubeprobes
+```
+
+## Uso
+
+```bash
+# Verificar todos os tipos de probes no namespace padrão
+kubeprobes scan
+
+# Verificar um tipo específico de probe com recomendações
+kubeprobes scan -p liveness -r
+
+# Verificar em um namespace específico
+kubeprobes scan -n meu-namespace
+
+# Usar um kubeconfig e contexto específicos
+kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
+```
+
+## Segurança
+
+Este projeto segue as melhores práticas de segurança do OpenSSF. Para reportar uma vulnerabilidade, por favor consulte nosso [SECURITY.md](SECURITY.md).
+
+## Contribuindo
+
+Contribuições são bem-vindas! Por favor, leia nosso [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre nosso código de conduta e o processo para enviar pull requests.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## Changelog
+
+Veja [CHANGELOG.md](CHANGELOG.md) para uma lista de mudanças.
 
 ```mermaid
 sequenceDiagram

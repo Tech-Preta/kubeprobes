@@ -1,0 +1,33 @@
+name: Code Review Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Define permissões mínimas no nível do workflow
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    # Define permissões específicas para este job
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Check for Code Review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const hasApproval = reviews.some(review => review.state === 'APPROVED');
+            
+            if (!hasApproval) {
+              core.setFailed('This pull request requires at least one approval before merging.');
+            } 

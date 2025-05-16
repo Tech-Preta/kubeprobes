@@ -13,14 +13,18 @@ on:
       - reopened  
   workflow_dispatch: 
 
+# Define permissões mínimas no nível do workflow
 permissions:
   contents: read
-  security-events: write # Permissão necessária para upload de SARIF
 
 jobs:
   checkov-scan:
     name: Checkov Scan
     runs-on: ubuntu-latest
+    # Define permissões específicas para este job
+    permissions:
+      contents: read
+      security-events: write # Permissão necessária apenas para upload de SARIF
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
