@@ -28,6 +28,6 @@ jobs:
         with:
           version: latest
           workdir: src
-          args: release
+          args: release --config ../.goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.USER_TOKEN }}
