@@ -1,0 +1,35 @@
+{
+    "name": "DevOps Environment",
+    "build": {
+      "dockerfile": "Dockerfile"
+    },
+    "mounts": [
+      "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-azuretools.vscode-docker",
+          "ms-kubernetes-tools.vscode-kubernetes-tools",
+          "redhat.vscode-yaml",
+          "streetsidesoftware.code-spell-checker",
+          "ms-vscode-remote.remote-containers",
+          "github.copilot"
+        ],
+        "settings": {
+          "terminal.integrated.defaultProfile.linux": "bash",
+          "terminal.integrated.profiles.linux": {
+            "bash": {
+              "path": "/bin/bash"
+            }
+          }
+        }
+      }
+    },
+    "forwardPorts": [
+      2375,
+      6443
+    ],
+    "postCreateCommand": "bash ./.devcontainer/post-create.sh",
+    "remoteUser": "vscode"
+  }
