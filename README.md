@@ -59,15 +59,27 @@ Veja [CHANGELOG.md](CHANGELOG.md) para uma lista de mudanças.
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant CLI
-    participant K8sAPI
+    participant Usuário
+    participant CLI kubeprobes
+    participant Kubernetes API
 
-    User->>CLI: kubeprobes scan -k <kubeconfig> -c <context> -n <namespace> -p <probe> -r
-    CLI->>K8sAPI: Fetch workloads in namespace
-    K8sAPI-->>CLI: Return workload details
-    CLI->>CLI: Scan for specified probes
-    CLI->>User: Display scan results and recommendations
+    Usuário->>CLI kubeprobes: Executa comando scan (com flags)
+    CLI kubeprobes->>CLI kubeprobes: Valida flags (kubeconfig, namespace, probe-type)
+    CLI kubeprobes->>Kubernetes API: Lista pods no namespace
+    Kubernetes API-->>CLI kubeprobes: Retorna lista de pods
+    alt Nenhum pod encontrado
+        CLI kubeprobes->>Usuário: Exibe mensagem "Nenhum pod encontrado"
+    else Pods encontrados
+        CLI kubeprobes->>CLI kubeprobes: Para cada pod/container, verifica probes
+        alt Container sem probe requisitado
+            CLI kubeprobes->>Usuário: Exibe aviso de ausência de probe e recomendações (se flag ativada)
+        end
+        alt Nenhum problema encontrado
+            CLI kubeprobes->>Usuário: Exibe mensagem "Nenhum problema de probe encontrado"
+        else Problemas encontrados
+            CLI kubeprobes->>Usuário: Sai com status 1
+        end
+    end
 ```
 
 ## Requisitos
