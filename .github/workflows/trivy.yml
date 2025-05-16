@@ -2,7 +2,7 @@ name: Generate SBOM
 on:
   push:
     branches:
-    - main
+      - main
 
 # Define permissões mínimas no nível do workflow
 permissions:
@@ -21,8 +21,8 @@ jobs:
       - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          scan-type: 'fs'
-          format: 'github'
-          output: 'dependency-results.sbom.json'
-          image-ref: '.'
-          github-pat: ${{ secrets.USER_TOKEN }} 
+          scan-type: "fs"
+          format: "github"
+          output: "dependency-results.sbom.json"
+          image-ref: "."
+          github-pat: ${{ secrets.USER_TOKEN }}

@@ -5,8 +5,8 @@
 Use esta seção para informar às pessoas sobre quais versões do seu projeto estão atualmente sendo suportadas com atualizações de segurança.
 
 | Versão | Suportada          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+| ------ | ------------------ |
+| 1.0.x  | :white_check_mark: |
 
 ## Reportando uma Vulnerabilidade
 
@@ -14,7 +14,7 @@ Se você descobrir uma vulnerabilidade de segurança, por favor, nos informe ime
 
 Para reportar uma vulnerabilidade, por favor:
 
-1. Envie um email para [seu-email@dominio.com] com o assunto "VULNERABILIDADE: [nome do projeto]"
+1. Envie um email para [contato@nataliagranato.xyz] com o assunto "VULNERABILIDADE: [nome do projeto]"
 2. Inclua detalhes sobre a vulnerabilidade
 3. Inclua passos para reproduzir o problema
 4. Inclua qualquer informação adicional que possa ser útil

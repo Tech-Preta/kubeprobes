@@ -13,16 +13,43 @@ Uma ferramenta CLI para verificar probes do Kubernetes em seus workloads.
 
 ## Instalação
 
+> Para uso com Docker, consulte a [documentação Docker](docs/docker.md).
+
 ### Binários Pré-compilados
 
 Baixe o binário apropriado para seu sistema da [página de releases](https://github.com/nataliagranato/kubeprobes/releases).
 
 ### Compilando do Código Fonte
 
+1. Clone o repositório:
+
 ```bash
-git clone https://github.com/nataliagranato/kubeprobes.git
-cd kubeprobes/src
+git clone https://github.com/Tech-Preta/kubeprobes.git
+```
+
+2. Entre no diretório do projeto:
+
+```bash
+cd kubeprobes
+```
+
+3. Compile o código fonte:
+
+```bash
+cd src
 go build -o kubeprobes
+```
+
+4. (Opcional) Mova o binário para o diretório /usr/local/bin:
+
+```bash
+sudo mv kubeprobes /usr/local/bin
+```
+
+5. Verifique se a instalação foi bem sucedida:
+
+```bash
+kubeprobes --help
 ```
 
 ## Uso
@@ -40,6 +67,10 @@ kubeprobes scan -n meu-namespace
 # Usar um kubeconfig e contexto específicos
 kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
 ```
+
+### Códigos de saída
+- 0: Nenhum problema de probe encontrado
+- 1: Problemas de probe encontrados
 
 ## Segurança
 
@@ -87,39 +118,6 @@ sequenceDiagram
 - Go 1.13 ou superior
 - kubectl
 - Um cluster Kubernetes acessível
-
-## Instalação
-
-1. Clone o repositório:
-
-```bash
-https://github.com/Tech-Preta/kubeprobes.git
-```
-
-2. Entre no diretório do projeto:
-
-```bash
-cd kubeprobes
-```
-
-3. Compile o código fonte:
-
-```bash
-cd src
-go build -o kubeprobes
-```
-
-4. Mova o binário para o diretório /usr/local/bin:
-
-```bash
-sudo mv kubeprobes /usr/local/bin
-```
-
-5. Verifique se a instalação foi bem sucedida:
-
-```bash
-kubeprobes --help
-```
 
 ## Uso
 

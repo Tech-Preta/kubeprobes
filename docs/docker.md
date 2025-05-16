@@ -7,7 +7,7 @@ Este documento descreve como usar o Docker para executar o kubeprobes.
 Para construir a imagem Docker, execute o seguinte comando na raiz do projeto:
 
 ```sh
-docker build -t kubeprobes:1.1.0 .
+docker build -t kubeprobes:1.2.0 .
 ```
 
 # Como executar o kubeprobes via Docker
@@ -15,7 +15,7 @@ docker build -t kubeprobes:1.1.0 .
 ## Exibir ajuda
 
 ```sh
-docker run --rm kubeprobes:1.1.0 --help
+docker run --rm kubeprobes:1.2.0 --help
 ```
 
 ## Rodar o scan em um cluster Kubernetes
@@ -27,7 +27,7 @@ Monte seu kubeconfig local como volume e passe o caminho para o comando:
 ```sh
 docker run --rm --network=host \
   -v $HOME/.kube/config:/kubeconfig:ro \
-  kubeprobes:1.1.0 scan --kubeconfig /kubeconfig
+  kubeprobes:1.2.0 scan --kubeconfig /kubeconfig
 ```
 
 ### Analisar um namespace específico
@@ -35,7 +35,7 @@ docker run --rm --network=host \
 ```sh
 docker run --rm --network=host \
   -v $HOME/.kube/config:/kubeconfig:ro \
-  kubeprobes:1.1.0 scan --kubeconfig /kubeconfig --namespace NOME_DO_NAMESPACE
+  kubeprobes:1.2.0 scan --kubeconfig /kubeconfig --namespace NOME_DO_NAMESPACE
 ```
 
 ### Analisar todos os namespaces
@@ -43,7 +43,7 @@ docker run --rm --network=host \
 ```sh
 docker run --rm --network=host \
   -v $HOME/.kube/config:/kubeconfig:ro \
-  kubeprobes:1.1.0 scan --kubeconfig /kubeconfig --namespace ""
+  kubeprobes:1.2.0 scan --kubeconfig /kubeconfig --namespace ""
 ```
 
 ### Exemplos de saída
@@ -64,11 +64,11 @@ Você pode adicionar outras opções, como namespace ou tipo de probe:
 ```sh
 docker run --rm \
   -v $HOME/.kube/config:/kubeconfig:ro \
-  kubeprobes:1.1.0 scan --kubeconfig /kubeconfig --namespace default --probe-type liveness
+  kubeprobes:1.2.0 scan --kubeconfig /kubeconfig --namespace default --probe-type liveness
 ```
 
 Consulte as opções disponíveis com:
 
 ```sh
-docker run --rm kubeprobes:1.1.0 scan --help
+docker run --rm kubeprobes:1.2.0 scan --help
 ```
