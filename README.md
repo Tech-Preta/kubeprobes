@@ -1,6 +1,6 @@
 # Kubeprobes
 
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/XXXX/badge)](https://www.bestpractices.dev/projects/XXXX)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10573/badge)](https://www.bestpractices.dev/projects/10573)
 
 Uma ferramenta CLI para verificar probes do Kubernetes em seus workloads.
 
