@@ -17,7 +17,7 @@ Uma ferramenta CLI para verificar probes do Kubernetes em seus workloads.
 
 ### Binários Pré-compilados
 
-Baixe o binário apropriado para seu sistema da [página de releases](https://github.com/nataliagranato/kubeprobes/releases).
+Baixe o binário apropriado para seu sistema da [página de releases](https://github.com/Tech-Preta/kubeprobes/releases).
 
 ### Compilando do Código Fonte
 
@@ -66,11 +66,24 @@ kubeprobes scan -n meu-namespace
 
 # Usar um kubeconfig e contexto específicos
 kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
+
+# Exemplo completo:
+kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <namespace> -p <tipo-de-probe> -r
 ```
 
 ### Códigos de saída
 - 0: Nenhum problema de probe encontrado
 - 1: Problemas de probe encontrados
+
+### Comandos Disponíveis
+- `scan`: Escaneia workloads do Kubernetes em busca de probes.
+
+### Flags
+- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
+- `-c, --kubeContext`: Contexto do Kubernetes.
+- `-n, --namespace`: Namespace do Kubernetes.
+- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
+- `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
 
 ## Segurança
 
@@ -118,27 +131,6 @@ sequenceDiagram
 - Go 1.13 ou superior
 - kubectl
 - Um cluster Kubernetes acessível
-
-## Uso
-
-### Comandos Disponíveis
-
-- `scan`: Escaneia workloads do Kubernetes em busca de probes.
-  
-  Exemplo de uso:
-
-```bash
-
-kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <namespace> -p <tipo-de-probe> -r
-```
-
-### Flags
-
-- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
-- `-c, --kubeContext`: Contexto do Kubernetes.
-- `-n, --namespace`: Namespace do Kubernetes.
-- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
-- `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
 
 ## Contribuições
 

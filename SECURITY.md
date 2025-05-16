@@ -6,7 +6,8 @@ Use esta seção para informar às pessoas sobre quais versões do seu projeto e
 
 | Versão | Suportada          |
 | ------ | ------------------ |
-| 1.0.x  | :white_check_mark: |
+| 1.0.0  | :white_check_mark: |
+| 1.1.0  | :white_check_mark: |
 
 ## Reportando uma Vulnerabilidade
 
