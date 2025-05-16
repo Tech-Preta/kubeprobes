@@ -1,0 +1,47 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Changelog
+        run: |
+          # Get the version from the tag
+          VERSION=${GITHUB_REF#refs/tags/v}
+          
+          # Update the Unreleased section to the new version
+          sed -i "s/## \[Unreleased\]/## \[Unreleased\]\n\n## \[$VERSION\] - $(date +%Y-%m-%d)/" CHANGELOG.md
+          
+          # Commit and push the changes
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG.md for version $VERSION"
+          git push 

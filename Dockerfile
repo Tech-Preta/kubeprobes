@@ -1,23 +1,32 @@
-# Use the official Golang image to create a build artifact.
-# This is based on Debian and sets the GOPATH to /go.
-<<<<<<< HEAD
-FROM golang:1.24.1-alpine3.21 as builder
-=======
-FROM FROM golang:1.23.1 as builder
+# Build stage
+FROM cgr.dev/chainguard/go:latest AS builder
 
->>>>>>> main
+WORKDIR /app/src
 
-# Copy local code to the container image.
-WORKDIR /go/src/projeto
-COPY . .
+# Copy go mod files
+COPY src/go.mod ./
+COPY src/go.sum ./
 
-# Build the command inside the container.
-RUN go get -d -v ./...
-RUN go install -v ./...
+# Download dependencies and generate go.sum
+RUN go mod download && go mod tidy
 
-# Use a Docker multi-stage build to create a lean production image.
-FROM golang:1.24.1-alpine3.21
-COPY --from=builder /go/bin/projeto /projeto
+# Copy source code
+COPY src/. .
 
-# Run the web service on container startup.
-CMD ["/projeto"]
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes probes.go
+
+# Final stage
+FROM cgr.dev/chainguard/static:latest
+
+# Copy the binary from builder
+COPY --from=builder /app/kubeprobes /usr/local/bin/kubeprobes
+
+# Set the entrypoint
+ENTRYPOINT ["kubeprobes"]
+
+# Adiciona HEALTHCHECK inline usando exec form
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["sh", "-c", "kubeprobes --help > /dev/null 2>&1 || exit 1"]
+
+# Default command
+CMD ["--help"]

@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+kubeprobes
 
 # Test binary, built with `go test -c`
 *.test
@@ -19,4 +20,14 @@
 
 # Go workspace file
 go.work
-go.work.sum
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+.qodo

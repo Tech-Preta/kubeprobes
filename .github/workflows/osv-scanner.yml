@@ -21,15 +21,17 @@ on:
   push:
     branches: [ "main" ]
 
+# Define permissões mínimas no nível do workflow
 permissions:
-  # Require writing security events to upload SARIF file to security tab
-  security-events: write
-  # Read commit contents
   contents: read
 
 jobs:
   scan-scheduled:
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+    # Define permissões específicas para este job
+    permissions:
+      contents: read
+      security-events: write # Permissão necessária para upload de SARIF
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@6fc714450122bda9d00e4ad5d639ad6a39eedb1f" # v2.0.1
     with:
       # Example of specifying custom arguments
@@ -37,8 +39,13 @@ jobs:
         -r
         --skip-git
         ./
+
   scan-pr:
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    # Define permissões específicas para este job
+    permissions:
+      contents: read
+      security-events: write # Permissão necessária para upload de SARIF
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@6fc714450122bda9d00e4ad5d639ad6a39eedb1f" # v2.0.1
     with:
       # Example of specifying custom arguments

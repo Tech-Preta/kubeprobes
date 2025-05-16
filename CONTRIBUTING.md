@@ -1,33 +1,52 @@
-# Contribuindo para o Projeto
+# Guia de Contribuição
 
-Obrigado por considerar contribuir para este projeto! Abaixo estão algumas diretrizes para ajudar você a começar.
+Obrigado por considerar contribuir com o projeto! Este documento fornece diretrizes e instruções para contribuir.
 
 ## Como Contribuir
 
-### Reportando Problemas
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Crie um Pull Request
 
-Se você encontrar um bug ou tiver uma sugestão de melhoria, por favor, abra uma issue no repositório. Certifique-se de incluir o máximo de detalhes possível, incluindo passos para reproduzir o problema, se aplicável.
+## Padrões de Código
 
-### Enviando Pull Requests
+- Siga as [boas práticas de Go](https://golang.org/doc/effective_go)
+- Use `gofmt` para formatar seu código
+- Execute os testes antes de submeter (`go test ./...`)
+- Mantenha a cobertura de testes alta
 
-1. **Fork o repositório**: Clique no botão "Fork" no topo da página do repositório.
-2. **Clone o seu fork**:
-    ```sh
-    git clone https://github.com/Tech-Preta/repository_sample
-    cd repository_sample
-    ```
-3. **Crie uma branch para a sua feature ou correção**:
-    ```sh
-    git checkout -b minha-feature
-    ```
-4. **Faça as suas mudanças**: Adicione ou modifique o código conforme necessário.
-5. **Adicione testes**: Certifique-se de que suas mudanças estão cobertas por testes.
-6. **Commit suas mudanças**:
-    ```sh
-    git commit -m "Descrição das minhas mudanças"
-    ```
-7. **Envie a sua branch**:
-    ```sh
-    git push origin minha-feature
-    ```
-8. **Abra um Pull Request**: Vá até a página do repositório original e clique em "New Pull Request". Compare a sua branch com a branch `main` do repositório original e envie o Pull Request.
+## Processo de Pull Request
+
+1. Atualize a documentação se necessário
+2. Adicione testes para novas funcionalidades
+3. Certifique-se de que todos os testes passam
+4. Atualize o CHANGELOG.md
+5. Descreva suas mudanças no PR
+
+## Relatando Bugs
+
+Use o template de issue para bugs e inclua:
+- Descrição clara do problema
+- Passos para reproduzir
+- Comportamento esperado
+- Comportamento atual
+- Screenshots (se aplicável)
+- Ambiente (sistema operacional, versão do Go, etc.)
+
+## Sugerindo Features
+
+Use o template de issue para features e inclua:
+- Descrição clara da feature
+- Casos de uso
+- Benefícios
+- Possíveis implementações
+
+## Código de Conduta
+
+Por favor, leia e siga nosso [Código de Conduta](CODE_OF_CONDUCT.md).
+
+## Licença
+
+Ao contribuir, você concorda que suas contribuições serão licenciadas sob a mesma licença do projeto.

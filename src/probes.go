@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -11,6 +13,13 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+var validProbeTypes = map[string]bool{
+	"liveness":  true,
+	"readiness": true,
+	"startup":   true,
+	"":          true, // empty string means all types
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "probes",
@@ -20,12 +29,44 @@ var rootCmd = &cobra.Command{
 var scanCmd = &cobra.Command{
 	Use:   "scan",
 	Short: "Scan Kubernetes workloads for probes",
+	Long: `Scan Kubernetes workloads for missing liveness, readiness, or startup probes.
+
+Exit codes:
+  0: Nenhum problema encontrado
+  1: Problemas de probe encontrados
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		kubeconfig, _ := cmd.Flags().GetString("kubeconfig")
-		kubeContext, _ := cmd.Flags().GetString("kubeContext")
-		namespace, _ := cmd.Flags().GetString("namespace")
-		probeType, _ := cmd.Flags().GetString("probe-type")
-		recommendation, _ := cmd.Flags().GetBool("recommendation")
+		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
+		if err != nil {
+			log.Fatalf("Error getting kubeconfig flag: %s", err.Error())
+		}
+
+		kubeContext, err := cmd.Flags().GetString("kubeContext")
+		if err != nil {
+			log.Fatalf("Error getting kubeContext flag: %s", err.Error())
+		}
+
+		namespace, err := cmd.Flags().GetString("namespace")
+		if namespace == "" {
+			namespace = "default"
+		}
+		if err != nil {
+			log.Fatalf("Error getting namespace flag: %s", err.Error())
+		}
+
+		probeType, err := cmd.Flags().GetString("probe-type")
+		if err != nil {
+			log.Fatalf("Error getting probe-type flag: %s", err.Error())
+		}
+		if !validProbeTypes[strings.ToLower(probeType)] {
+			log.Fatalf("Invalid probe type: %s. Valid types are: liveness, readiness, startup", probeType)
+		}
+		probeType = strings.ToLower(probeType)
+
+		recommendation, err := cmd.Flags().GetBool("recommendation")
+		if err != nil {
+			log.Fatalf("Error getting recommendation flag: %s", err.Error())
+		}
 
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 			&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig},
@@ -44,33 +85,52 @@ var scanCmd = &cobra.Command{
 			log.Fatalf("Error listing pods: %s", err.Error())
 		}
 
+		if len(pods.Items) == 0 {
+			fmt.Printf("No pods found in namespace %s\n", namespace)
+			os.Exit(0)
+		}
+
+		issuesFound := false
 		for _, pod := range pods.Items {
 			for _, container := range pod.Spec.Containers {
 				if probeType == "liveness" || probeType == "" {
 					if container.LivenessProbe == nil {
-						fmt.Printf("Pod %s in namespace %s does not have a liveness probe\n", pod.Name, pod.Namespace)
+						issuesFound = true
+						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a liveness probe\n",
+							pod.Namespace, pod.Name, container.Name)
 						if recommendation {
-							fmt.Println("Recommendation: Add a liveness probe to ensure the container is running correctly.")
+							fmt.Println("  Recommendation: Add a liveness probe to ensure the container is running correctly.")
 						}
 					}
 				}
 				if probeType == "readiness" || probeType == "" {
 					if container.ReadinessProbe == nil {
-						fmt.Printf("Pod %s in namespace %s does not have a readiness probe\n", pod.Name, pod.Namespace)
+						issuesFound = true
+						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a readiness probe\n",
+							pod.Namespace, pod.Name, container.Name)
 						if recommendation {
-							fmt.Println("Recommendation: Add a readiness probe to ensure the container is ready to accept traffic.")
+							fmt.Println("  Recommendation: Add a readiness probe to ensure the container is ready to accept traffic.")
 						}
 					}
 				}
 				if probeType == "startup" || probeType == "" {
 					if container.StartupProbe == nil {
-						fmt.Printf("Pod %s in namespace %s does not have a startup probe\n", pod.Name, pod.Namespace)
+						issuesFound = true
+						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a startup probe\n",
+							pod.Namespace, pod.Name, container.Name)
 						if recommendation {
-							fmt.Println("Recommendation: Add a startup probe to ensure the container has started successfully.")
+							fmt.Println("  Recommendation: Add a startup probe to ensure the container has started successfully.")
 						}
 					}
 				}
 			}
+		}
+
+		if !issuesFound {
+			fmt.Printf("No probe issues found in namespace %s\n", namespace)
+		} else {
+			fmt.Println("Issues found. Exiting with status code 1.")
+			os.Exit(1)
 		}
 	},
 }
@@ -78,7 +138,7 @@ var scanCmd = &cobra.Command{
 func main() {
 	scanCmd.Flags().StringP("kubeconfig", "k", "", "path to the kubeconfig file")
 	scanCmd.Flags().StringP("kubeContext", "c", "", "Kubernetes context")
-	scanCmd.Flags().StringP("namespace", "n", "", "Kubernetes namespace")
+	scanCmd.Flags().StringP("namespace", "n", "default", "Kubernetes namespace (default: default)")
 	scanCmd.Flags().StringP("probe-type", "p", "", "type of probe to scan for (liveness, readiness, startup)")
 	scanCmd.Flags().BoolP("recommendation", "r", false, "show recommendations for missing probes")
 

@@ -2,30 +2,46 @@
 
 ## Versões Suportadas
 
-| Versão  | Suporte          |
-| ------- | ---------------- |
+Use esta seção para informar às pessoas sobre quais versões do seu projeto estão atualmente sendo suportadas com atualizações de segurança.
+
+| Versão | Suportada          |
+| ------ | ------------------ |
 | 1.0.0  | :white_check_mark: |
+| 1.1.0  | :white_check_mark: |
 
-## Reportando Vulnerabilidades
+## Reportando uma Vulnerabilidade
 
-Agradecemos seu interesse em ajudar a manter nosso projeto seguro. Se você descobrir uma vulnerabilidade de segurança, por favor:
+Se você descobrir uma vulnerabilidade de segurança, por favor, nos informe imediatamente. Não abra um issue público para vulnerabilidades de segurança.
 
-1. **Não crie uma Issue pública** - Vulnerabilidades de segurança não devem ser discutidas publicamente
-2. **Envie um e-mail** para [contato@nataliagranato.xyz]
-3. **Inclua detalhes**:
-   - Descrição clara da vulnerabilidade
-   - Passos para reproduzir
-   - Versão afetada
-   - Possível impacto
+Para reportar uma vulnerabilidade, por favor:
 
-### O que esperar
+1. Envie um email para [contato@nataliagranato.xyz] com o assunto "VULNERABILIDADE: [nome do projeto]"
+2. Inclua detalhes sobre a vulnerabilidade
+3. Inclua passos para reproduzir o problema
+4. Inclua qualquer informação adicional que possa ser útil
 
-Após reportar uma vulnerabilidade:
+Nós responderemos dentro de 48 horas e manteremos você informado sobre o progresso da correção.
 
-- Confirmação de recebimento em até 48 horas
-- Avaliação inicial em até 7 dias
-- Atualizações regulares sobre o progresso
-- Crédito adequado quando a vulnerabilidade for corrigida
+## Processo de Resposta
+
+1. Confirmaremos o recebimento do seu relatório
+2. Investigaremos a vulnerabilidade
+3. Desenvolveremos uma correção
+4. Testaremos a correção
+5. Lançaremos a atualização
+6. Notificaremos você sobre a resolução
+
+## Compromisso com a Segurança
+
+Nós nos comprometemos a:
+- Responder rapidamente a relatórios de vulnerabilidades
+- Manter os usuários informados sobre vulnerabilidades conhecidas
+- Fornecer atualizações de segurança para versões suportadas
+- Seguir as melhores práticas de segurança no desenvolvimento
+
+## Atualizações de Segurança
+
+Todas as atualizações de segurança serão lançadas como versões de patch (ex: 1.0.1, 1.0.2, etc.).
 
 ## Práticas de Segurança
 
