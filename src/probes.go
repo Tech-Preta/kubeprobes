@@ -135,6 +135,7 @@ Exit codes:
 	},
 }
 
+// main initializes CLI flags, sets up commands, and starts the probes CLI tool.
 func main() {
 	scanCmd.Flags().StringP("kubeconfig", "k", "", "path to the kubeconfig file")
 	scanCmd.Flags().StringP("kubeContext", "c", "", "Kubernetes context")
