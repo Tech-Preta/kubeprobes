@@ -32,6 +32,6 @@ func NewClient(kubeconfig, kubeContext string) (*Client, error) {
 }
 
 // GetPods returns all pods in the specified namespace
-func (c *Client) GetPods(namespace string) (*corev1.PodList, error) {
-	return c.clientset.CoreV1().Pods(namespace).List(context.TODO(), v1.ListOptions{})
+func (c *Client) GetPods(ctx context.Context, namespace string) (*corev1.PodList, error) {
+	return c.clientset.CoreV1().Pods(namespace).List(ctx, v1.ListOptions{})
 }
