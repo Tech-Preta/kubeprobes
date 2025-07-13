@@ -94,6 +94,26 @@ kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <name
 
 Este projeto segue as melhores práticas de segurança do OpenSSF. Para reportar uma vulnerabilidade, por favor consulte nosso [SECURITY.md](SECURITY.md).
 
+## Releases
+
+Este projeto utiliza um processo automatizado de releases através do GitHub Actions e GoReleaser.
+
+### Como Funciona
+
+- **Criação de Release**: Quando uma nova tag com formato `v*` (ex: `v1.0.0`) é criada e enviada para o repositório, o workflow de release é automaticamente executado.
+- **Artefatos Gerados**: O processo gera binários para múltiplas plataformas (Linux, macOS, Windows) e arquiteturas (amd64, arm64).
+- **Distribuição**: Os binários são automaticamente disponibilizados na [página de releases](https://github.com/Tech-Preta/kubeprobes/releases) do GitHub.
+
+### Para Criar uma Nova Release
+
+```bash
+# Crie e envie uma nova tag
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+O processo de release será executado automaticamente e estará disponível em alguns minutos.
+
 ## Contribuindo
 
 Contribuições são bem-vindas! Por favor, leia nosso [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre nosso código de conduta e o processo para enviar pull requests.
