@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"kubeprobes/pkg/kubernetes"
-	corev1 "k8s.io/api/core/v1"
 )
 
 var validProbeTypes = map[string]bool{
