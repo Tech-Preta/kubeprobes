@@ -97,10 +97,11 @@ func (ps *ProbeScanner) Scan() error {
 	}
 
 	if !issuesFound {
-		fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
+	    fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
+	    return nil
 	} else {
-		fmt.Println("Issues found.")
-		return fmt.Errorf("probe issues detected in namespace %s", ps.namespace)
+	    fmt.Println("Issues found. Exiting with status code 1.")
+	    return fmt.Errorf("probe issues found")
 	}
 
 	return nil
