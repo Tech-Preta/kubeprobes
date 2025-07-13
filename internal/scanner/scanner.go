@@ -98,8 +98,8 @@ func (ps *ProbeScanner) Scan() error {
 	if !issuesFound {
 		fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
 	} else {
-		fmt.Println("Issues found. Exiting with status code 1.")
-		os.Exit(1)
+		fmt.Println("Issues found.")
+		return fmt.Errorf("probe issues detected in namespace %s", ps.namespace)
 	}
 
 	return nil
