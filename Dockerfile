@@ -29,8 +29,8 @@ COPY --from=builder /app/kubeprobes /usr/local/bin/kubeprobes
 # Set the entrypoint
 ENTRYPOINT ["kubeprobes"]
 
-# Adiciona HEALTHCHECK inline usando exec form
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["sh", "-c", "kubeprobes --help > /dev/null 2>&1 || exit 1"]
+# Simple healthcheck using the binary itself
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD ["kubeprobes", "--help"]
 
 # Default command
 CMD ["--help"]

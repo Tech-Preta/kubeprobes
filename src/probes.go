@@ -21,6 +21,15 @@ var validProbeTypes = map[string]bool{
 	"":          true, // empty string means all types
 }
 
+// ProbeIssuesFoundError indicates that probe issues were found during scanning
+type ProbeIssuesFoundError struct {
+	Message string
+}
+
+func (e *ProbeIssuesFoundError) Error() string {
+	return e.Message
+}
+
 // validateProbeType explicitly validates the probe type flag
 func validateProbeType(probeType string) error {
 	if !validProbeTypes[strings.ToLower(probeType)] {
@@ -158,7 +167,7 @@ Exit codes:
 
 		if issuesFound {
 			fmt.Println("Issues found. Exiting with status code 1.")
-			os.Exit(1)
+			return &ProbeIssuesFoundError{Message: "probe issues found"}
 		}
 
 		return nil
@@ -174,6 +183,10 @@ func main() {
 
 	rootCmd.AddCommand(scanCmd)
 	if err := rootCmd.Execute(); err != nil {
+		// Check if it's our custom error indicating probe issues found
+		if _, ok := err.(*ProbeIssuesFoundError); ok {
+			os.Exit(1)
+		}
 		log.Fatalf("Error executing command: %s", err.Error())
 	}
 }
