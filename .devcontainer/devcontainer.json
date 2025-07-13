@@ -9,18 +9,54 @@
     "customizations": {
       "vscode": {
         "extensions": [
+          "golang.go",
           "ms-azuretools.vscode-docker",
           "ms-kubernetes-tools.vscode-kubernetes-tools",
           "redhat.vscode-yaml",
           "streetsidesoftware.code-spell-checker",
           "ms-vscode-remote.remote-containers",
-          "github.copilot"
+          "github.copilot",
+          "ms-vscode.makefile-tools"
         ],
         "settings": {
           "terminal.integrated.defaultProfile.linux": "bash",
           "terminal.integrated.profiles.linux": {
             "bash": {
               "path": "/bin/bash"
+            }
+          },
+          "go.gopath": "/home/vscode/go",
+          "go.goroot": "/usr/local/go",
+          "go.toolsManagement.checkForUpdates": "local",
+          "go.useLanguageServer": true,
+          "go.formatTool": "goimports",
+          "go.lintTool": "golangci-lint",
+          "go.lintOnSave": "package",
+          "go.buildOnSave": "package",
+          "go.testOnSave": false,
+          "go.coverOnSave": false,
+          "go.delveConfig": {
+            "dlvLoadConfig": {
+              "followPointers": true,
+              "maxVariableRecurse": 1,
+              "maxStringLen": 64,
+              "maxArrayValues": 64,
+              "maxStructFields": -1
+            },
+            "apiVersion": 2,
+            "showGlobalVariables": true
+          },
+          "[go]": {
+            "editor.insertSpaces": false,
+            "editor.formatOnSave": true,
+            "editor.codeActionsOnSave": {
+              "source.organizeImports": "explicit"
+            }
+          },
+          "[go.mod]": {
+            "editor.formatOnSave": true,
+            "editor.codeActionsOnSave": {
+              "source.organizeImports": "explicit"
             }
           }
         }

@@ -31,3 +31,14 @@ go.work
 .DS_Store
 Thumbs.db
 .qodo
+
+# Build artifacts
+bin/
+dist/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
