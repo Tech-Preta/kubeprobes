@@ -1,7 +1,8 @@
 package scanner
 
 import (
-	"log"
+	"context"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -17,40 +18,44 @@ Exit codes:
   0: Nenhum problema encontrado
   1: Problemas de probe encontrados
 `,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 			if err != nil {
-				log.Fatalf("Error getting kubeconfig flag: %s", err.Error())
+				return fmt.Errorf("error getting kubeconfig flag: %w", err)
 			}
 
 			kubeContext, err := cmd.Flags().GetString("kubeContext")
 			if err != nil {
-				log.Fatalf("Error getting kubeContext flag: %s", err.Error())
+				return fmt.Errorf("error getting kubeContext flag: %w", err)
 			}
 
 			namespace, err := cmd.Flags().GetString("namespace")
 			if err != nil {
-				log.Fatalf("Error getting namespace flag: %s", err.Error())
+				return fmt.Errorf("error getting namespace flag: %w", err)
 			}
 
 			probeType, err := cmd.Flags().GetString("probe-type")
 			if err != nil {
-				log.Fatalf("Error getting probe-type flag: %s", err.Error())
+				return fmt.Errorf("error getting probe-type flag: %w", err)
 			}
 
 			recommendation, err := cmd.Flags().GetBool("recommendation")
 			if err != nil {
-				log.Fatalf("Error getting recommendation flag: %s", err.Error())
+				return fmt.Errorf("error getting recommendation flag: %w", err)
+			}
+
+			// Use context with timeout instead of context.TODO()
+			ctx := cmd.Context()
+			if ctx == nil {
+				ctx = context.Background()
 			}
 
 			scanner, err := NewProbeScanner(kubeconfig, kubeContext, namespace, probeType, recommendation)
 			if err != nil {
-				log.Fatalf("Error creating scanner: %s", err.Error())
+				return fmt.Errorf("error creating scanner: %w", err)
 			}
 
-			if err := scanner.Scan(); err != nil {
-				log.Fatalf("Error during scan: %s", err.Error())
-			}
+			return scanner.Scan(ctx)
 		},
 	}
 

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
+FROM mcr.microsoft.com/vscode/devcontainers/base:1.0-ubuntu-22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 

@@ -1,12 +1,11 @@
 package scanner
 
 import (
+	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"kubeprobes/pkg/kubernetes"
-	corev1 "k8s.io/api/core/v1"
 )
 
 var validProbeTypes = map[string]bool{
@@ -14,6 +13,15 @@ var validProbeTypes = map[string]bool{
 	"readiness": true,
 	"startup":   true,
 	"":          true, // empty string means all types
+}
+
+// ProbeIssuesFoundError indicates that probe issues were found during scanning
+type ProbeIssuesFoundError struct {
+	Message string
+}
+
+func (e *ProbeIssuesFoundError) Error() string {
+	return e.Message
 }
 
 // ProbeScanner handles the scanning logic
@@ -49,8 +57,8 @@ func NewProbeScanner(kubeconfig, kubeContext, namespace, probeType string, recom
 }
 
 // Scan performs the probe scanning
-func (ps *ProbeScanner) Scan() error {
-	pods, err := ps.kubeClient.GetPods(ps.namespace)
+func (ps *ProbeScanner) Scan(ctx context.Context) error {
+	pods, err := ps.kubeClient.GetPods(ctx, ps.namespace)
 	if err != nil {
 		return fmt.Errorf("error listing pods: %w", err)
 	}
@@ -97,12 +105,10 @@ func (ps *ProbeScanner) Scan() error {
 	}
 
 	if !issuesFound {
-	    fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
-	    return nil
-	} else {
-	    fmt.Println("Issues found. Exiting with status code 1.")
-	    return fmt.Errorf("probe issues found")
+		fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
+		return nil
 	}
 
-	return nil
+	fmt.Println("Issues found. Exiting with status code 1.")
+	return &ProbeIssuesFoundError{Message: "probe issues found"}
 }

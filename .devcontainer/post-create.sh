@@ -91,15 +91,20 @@ install_project_deps() {
     echo "Compilando o projeto..."
     make build || {
       echo "Falha no build com Makefile, tentando build direto..."
+      mkdir -p bin
       go build -o bin/kubeprobes ./cmd/kubeprobes
     }
     
     echo "Executando testes..."
-    go test -v ./... || { echo "Tests failed"; exit 1; }
+    if ! go test -v ./...; then
+      echo "ERRO: Testes falharam durante a configuração do ambiente."
+      return 1
+    fi
     
     echo "Projeto Go configurado com sucesso!"
   else
     echo "go.mod não encontrado no diretório do projeto"
+    return 1
   fi
 }
 
