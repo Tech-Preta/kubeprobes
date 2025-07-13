@@ -95,7 +95,7 @@ install_project_deps() {
     }
     
     echo "Executando testes..."
-    go test -v ./... || echo "Nenhum teste encontrado ou falha nos testes"
+    go test -v ./... || { echo "Tests failed"; exit 1; }
     
     echo "Projeto Go configurado com sucesso!"
   else
