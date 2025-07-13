@@ -125,13 +125,3 @@ sequenceDiagram
         end
     end
 ```
-
-## Requisitos
-
-- Go 1.13 ou superior
-- kubectl
-- Um cluster Kubernetes acessível
-
-## Contribuições
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir um issue ou enviar um pull request.

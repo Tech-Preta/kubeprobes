@@ -21,6 +21,69 @@ var validProbeTypes = map[string]bool{
 	"":          true, // empty string means all types
 }
 
+// validateProbeType explicitly validates the probe type flag
+func validateProbeType(probeType string) error {
+	if !validProbeTypes[strings.ToLower(probeType)] {
+		return fmt.Errorf("invalid probe type: %s. Valid types are: liveness, readiness, startup", probeType)
+	}
+	return nil
+}
+
+// scanProbes scans pods for missing probes and returns true if issues are found
+func scanProbes(ctx context.Context, clientset *kubernetes.Clientset, namespace, probeType string, showRecommendations bool) (bool, error) {
+	pods, err := clientset.CoreV1().Pods(namespace).List(ctx, v1.ListOptions{})
+	if err != nil {
+		return false, fmt.Errorf("error listing pods: %w", err)
+	}
+
+	if len(pods.Items) == 0 {
+		fmt.Printf("No pods found in namespace %s\n", namespace)
+		return false, nil
+	}
+
+	issuesFound := false
+	for _, pod := range pods.Items {
+		for _, container := range pod.Spec.Containers {
+			if probeType == "liveness" || probeType == "" {
+				if container.LivenessProbe == nil {
+					issuesFound = true
+					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a liveness probe\n",
+						pod.Namespace, pod.Name, container.Name)
+					if showRecommendations {
+						fmt.Println("  Recommendation: Add a liveness probe to ensure the container is running correctly.")
+					}
+				}
+			}
+			if probeType == "readiness" || probeType == "" {
+				if container.ReadinessProbe == nil {
+					issuesFound = true
+					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a readiness probe\n",
+						pod.Namespace, pod.Name, container.Name)
+					if showRecommendations {
+						fmt.Println("  Recommendation: Add a readiness probe to ensure the container is ready to accept traffic.")
+					}
+				}
+			}
+			if probeType == "startup" || probeType == "" {
+				if container.StartupProbe == nil {
+					issuesFound = true
+					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a startup probe\n",
+						pod.Namespace, pod.Name, container.Name)
+					if showRecommendations {
+						fmt.Println("  Recommendation: Add a startup probe to ensure the container has started successfully.")
+					}
+				}
+			}
+		}
+	}
+
+	if !issuesFound {
+		fmt.Printf("No probe issues found in namespace %s\n", namespace)
+	}
+
+	return issuesFound, nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "probes",
 	Short: "Probes is a CLI tool for scanning Kubernetes probes",
@@ -35,15 +98,15 @@ Exit codes:
   0: Nenhum problema encontrado
   1: Problemas de probe encontrados
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		if err != nil {
-			log.Fatalf("Error getting kubeconfig flag: %s", err.Error())
+			return fmt.Errorf("error getting kubeconfig flag: %w", err)
 		}
 
 		kubeContext, err := cmd.Flags().GetString("kubeContext")
 		if err != nil {
-			log.Fatalf("Error getting kubeContext flag: %s", err.Error())
+			return fmt.Errorf("error getting kubeContext flag: %w", err)
 		}
 
 		namespace, err := cmd.Flags().GetString("namespace")
@@ -51,87 +114,54 @@ Exit codes:
 			namespace = "default"
 		}
 		if err != nil {
-			log.Fatalf("Error getting namespace flag: %s", err.Error())
+			return fmt.Errorf("error getting namespace flag: %w", err)
 		}
 
 		probeType, err := cmd.Flags().GetString("probe-type")
 		if err != nil {
-			log.Fatalf("Error getting probe-type flag: %s", err.Error())
+			return fmt.Errorf("error getting probe-type flag: %w", err)
 		}
-		if !validProbeTypes[strings.ToLower(probeType)] {
-			log.Fatalf("Invalid probe type: %s. Valid types are: liveness, readiness, startup", probeType)
+
+		// Explicit validation for probe-type flag
+		if err := validateProbeType(probeType); err != nil {
+			return err
 		}
 		probeType = strings.ToLower(probeType)
 
 		recommendation, err := cmd.Flags().GetBool("recommendation")
 		if err != nil {
-			log.Fatalf("Error getting recommendation flag: %s", err.Error())
+			return fmt.Errorf("error getting recommendation flag: %w", err)
 		}
 
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 			&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig},
 			&clientcmd.ConfigOverrides{CurrentContext: kubeContext}).ClientConfig()
 		if err != nil {
-			log.Fatalf("Error building kubeconfig: %s", err.Error())
+			return fmt.Errorf("error building kubeconfig: %w", err)
 		}
 
 		clientset, err := kubernetes.NewForConfig(config)
 		if err != nil {
-			log.Fatalf("Error building kubernetes clientset: %s", err.Error())
+			return fmt.Errorf("error building kubernetes clientset: %w", err)
 		}
 
-		pods, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), v1.ListOptions{})
+		// Use context with timeout instead of context.TODO()
+		ctx := cmd.Context()
+		if ctx == nil {
+			ctx = context.Background()
+		}
+
+		issuesFound, err := scanProbes(ctx, clientset, namespace, probeType, recommendation)
 		if err != nil {
-			log.Fatalf("Error listing pods: %s", err.Error())
+			return err
 		}
 
-		if len(pods.Items) == 0 {
-			fmt.Printf("No pods found in namespace %s\n", namespace)
-			os.Exit(0)
-		}
-
-		issuesFound := false
-		for _, pod := range pods.Items {
-			for _, container := range pod.Spec.Containers {
-				if probeType == "liveness" || probeType == "" {
-					if container.LivenessProbe == nil {
-						issuesFound = true
-						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a liveness probe\n",
-							pod.Namespace, pod.Name, container.Name)
-						if recommendation {
-							fmt.Println("  Recommendation: Add a liveness probe to ensure the container is running correctly.")
-						}
-					}
-				}
-				if probeType == "readiness" || probeType == "" {
-					if container.ReadinessProbe == nil {
-						issuesFound = true
-						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a readiness probe\n",
-							pod.Namespace, pod.Name, container.Name)
-						if recommendation {
-							fmt.Println("  Recommendation: Add a readiness probe to ensure the container is ready to accept traffic.")
-						}
-					}
-				}
-				if probeType == "startup" || probeType == "" {
-					if container.StartupProbe == nil {
-						issuesFound = true
-						fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a startup probe\n",
-							pod.Namespace, pod.Name, container.Name)
-						if recommendation {
-							fmt.Println("  Recommendation: Add a startup probe to ensure the container has started successfully.")
-						}
-					}
-				}
-			}
-		}
-
-		if !issuesFound {
-			fmt.Printf("No probe issues found in namespace %s\n", namespace)
-		} else {
+		if issuesFound {
 			fmt.Println("Issues found. Exiting with status code 1.")
 			os.Exit(1)
 		}
+
+		return nil
 	},
 }
 

@@ -69,7 +69,15 @@ EOF
 # Instalar dependências do projeto (opcional)
 install_project_deps() {
   echo "Instalando dependências adicionais do projeto..."
-  # Adicione comandos adicionais aqui, se necessário
+  # Executar testes e falhar se eles falharem
+  cd /workspaces/kubeprobes/src
+  echo "Executando testes do projeto..."
+  if ! go test -v ./...; then
+    echo "ERRO: Testes falharam durante a configuração do ambiente."
+    return 1
+  fi
+  echo "Testes executados com sucesso!"
+  return 0
 }
 
 # Execução principal

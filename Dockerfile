@@ -1,5 +1,5 @@
 # Build stage
-FROM cgr.dev/chainguard/go:latest AS builder
+FROM cgr.dev/chainguard/go:1.24 AS builder
 
 WORKDIR /app/src
 
@@ -18,6 +18,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes probes.go
 
 # Final stage
 FROM cgr.dev/chainguard/static:latest
+
+# Create a non-root user
+# Note: chainguard/static already includes a non-root user 'nonroot' with UID 65532
+USER 65532:65532
 
 # Copy the binary from builder
 COPY --from=builder /app/kubeprobes /usr/local/bin/kubeprobes
