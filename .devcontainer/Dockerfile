@@ -33,6 +33,28 @@ RUN curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.21.0/kind-linux-
 # Helm
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+# Go programming language
+RUN GO_VERSION="1.24.5" \
+    && curl -Lo go.tar.gz "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" \
+    && sudo rm -rf /usr/local/go \
+    && sudo tar -C /usr/local -xzf go.tar.gz \
+    && rm go.tar.gz
+
+# Set Go environment variables
+ENV GOROOT=/usr/local/go
+ENV GOPATH=/home/vscode/go
+ENV PATH=$GOROOT/bin:$GOPATH/bin:$PATH
+
+# Create Go workspace directories
+RUN mkdir -p $GOPATH/{bin,src,pkg} \
+    && chown -R vscode:vscode $GOPATH
+
+# Install common Go tools
+RUN go install golang.org/x/tools/gopls@latest \
+    && go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go install honnef.co/go/tools/cmd/staticcheck@latest \
+    && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
 # K9s
 RUN curl -Lo k9s.tar.gz https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz \
     && tar -xf k9s.tar.gz \
