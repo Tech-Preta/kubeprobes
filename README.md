@@ -11,6 +11,12 @@ Uma ferramenta CLI para verificar probes do Kubernetes em seus workloads.
 - Fornece recomendações de configuração
 - Integração com diferentes contextos do Kubernetes
 
+## Requisitos
+
+- **Go**: versão 1.24.5 ou superior
+- **Kubernetes**: versão 1.28+ (cliente v0.31.0)
+- **Sistema**: Linux, macOS, ou Windows
+
 ## Instalação
 
 > Para uso com Docker, consulte a [documentação Docker](docs/docker.md).
@@ -36,14 +42,13 @@ cd kubeprobes
 3. Compile o código fonte:
 
 ```bash
-cd src
-go build -o kubeprobes
+make build
 ```
 
-4. (Opcional) Mova o binário para o diretório /usr/local/bin:
+4. (Opcional) Instale o binário no sistema:
 
 ```bash
-sudo mv kubeprobes /usr/local/bin
+make install
 ```
 
 5. Verifique se a instalação foi bem sucedida:

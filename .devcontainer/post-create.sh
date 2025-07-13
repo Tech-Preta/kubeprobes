@@ -66,18 +66,46 @@ EOF
   return 0
 }
 
-# Instalar dependências do projeto (opcional)
+# Instalar dependências do projeto
 install_project_deps() {
-  echo "Instalando dependências adicionais do projeto..."
-  # Executar testes e falhar se eles falharem
-  cd /workspaces/kubeprobes/src
-  echo "Executando testes do projeto..."
-  if ! go test -v ./...; then
-    echo "ERRO: Testes falharam durante a configuração do ambiente."
+  echo "Instalando dependências do projeto Go..."
+  
+  # Verificar se Go está instalado
+  if ! command -v go &> /dev/null; then
+    echo "Go não encontrado. Instalando..."
     return 1
   fi
-  echo "Testes executados com sucesso!"
-  return 0
+  
+  # Navegar para o diretório do projeto
+  cd /workspaces/kubeprobes
+  
+  # Instalar dependências do Go
+  if [ -f "go.mod" ]; then
+    echo "Instalando dependências do Go..."
+    go mod download
+    go mod tidy
+    
+    echo "Executando go vet..."
+    go vet ./...
+    
+    echo "Compilando o projeto..."
+    make build || {
+      echo "Falha no build com Makefile, tentando build direto..."
+      mkdir -p bin
+      go build -o bin/kubeprobes ./cmd/kubeprobes
+    }
+    
+    echo "Executando testes..."
+    if ! go test -v ./...; then
+      echo "ERRO: Testes falharam durante a configuração do ambiente."
+      return 1
+    fi
+    
+    echo "Projeto Go configurado com sucesso!"
+  else
+    echo "go.mod não encontrado no diretório do projeto"
+    return 1
+  fi
 }
 
 # Execução principal

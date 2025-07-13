@@ -1,20 +1,20 @@
 # Build stage
 FROM cgr.dev/chainguard/go:1.24 AS builder
 
-WORKDIR /app/src
+WORKDIR /app
 
 # Copy go mod files
-COPY src/go.mod ./
-COPY src/go.sum ./
+COPY go.mod ./
+COPY go.sum ./
 
 # Download dependencies and generate go.sum
 RUN go mod download && go mod tidy
 
 # Copy source code
-COPY src/. .
+COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes probes.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes ./cmd/kubeprobes
 
 # Final stage
 FROM cgr.dev/chainguard/static:latest
