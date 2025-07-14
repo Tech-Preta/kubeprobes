@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"kubeprobes/pkg/kubernetes"
+	corev1 "k8s.io/api/core/v1"
 )
 
 var validProbeTypes = map[string]bool{
@@ -13,6 +14,11 @@ var validProbeTypes = map[string]bool{
 	"readiness": true,
 	"startup":   true,
 	"":          true, // empty string means all types
+}
+
+// KubernetesClient interface for testing
+type KubernetesClient interface {
+	GetPods(ctx context.Context, namespace string) (*corev1.PodList, error)
 }
 
 // ProbeIssuesFoundError indicates that probe issues were found during scanning
@@ -26,7 +32,7 @@ func (e *ProbeIssuesFoundError) Error() string {
 
 // ProbeScanner handles the scanning logic
 type ProbeScanner struct {
-	kubeClient     *kubernetes.Client
+	kubeClient     KubernetesClient
 	namespace      string
 	probeType      string
 	recommendation bool
@@ -48,12 +54,21 @@ func NewProbeScanner(kubeconfig, kubeContext, namespace, probeType string, recom
 		return nil, fmt.Errorf("failed to connect to Kubernetes cluster: %w\n\nTroubleshooting tips:\n  - Ensure kubectl is configured and working: kubectl cluster-info\n  - Check kubeconfig file exists and is readable\n  - Verify the specified context exists: kubectl config get-contexts\n  - Try without specifying kubeconfig to use default: kubeprobes scan", err)
 	}
 
+	return NewProbeScannerWithClient(kubeClient, namespace, probeType, recommendation), nil
+}
+
+// NewProbeScannerWithClient creates a new probe scanner with a given client (useful for testing)
+func NewProbeScannerWithClient(kubeClient KubernetesClient, namespace, probeType string, recommendation bool) *ProbeScanner {
+	if namespace == "" {
+		namespace = "default"
+	}
+
 	return &ProbeScanner{
 		kubeClient:     kubeClient,
 		namespace:      namespace,
-		probeType:      probeType,
+		probeType:      strings.ToLower(probeType),
 		recommendation: recommendation,
-	}, nil
+	}
 }
 
 // Scan performs the probe scanning
