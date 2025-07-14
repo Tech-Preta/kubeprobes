@@ -57,11 +57,11 @@ jobs:
         fail_ci_if_error: false
 
     - name: Check coverage threshold
-      if: matrix.go-version == '1.24'
+      if: matrix.go-version == '1.23'
       run: |
         COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
         echo "Total coverage: $COVERAGE%"
-        if (( $(echo "$COVERAGE < 75" | bc -l) )); then
+        if [ $(echo "$COVERAGE < 75" | awk '{print ($1 < $2)}') -eq 1 ]; then
           echo "Error: Coverage $COVERAGE% is below required threshold of 75%"
           exit 1
         fi
