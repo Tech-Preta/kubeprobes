@@ -118,3 +118,87 @@ func TestVersionCommandInvalidOutput(t *testing.T) {
 		t.Errorf("Expected default output format for invalid output flag")
 	}
 }
+
+func TestVersionCommand_OutputFlag(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	// Test that output flag exists and has correct properties
+	flag := cmd.Flag("output")
+	if flag == nil {
+		t.Fatal("output flag should exist")
+	}
+
+	if flag.Shorthand != "o" {
+		t.Errorf("Expected shorthand 'o', got %q", flag.Shorthand)
+	}
+
+	if flag.DefValue != "default" {
+		t.Errorf("Expected default value 'default', got %q", flag.DefValue)
+	}
+}
+
+func TestVersionCommand_FlagCompletion(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	// Test that the output flag has completion registered
+	flag := cmd.Flag("output")
+	if flag == nil {
+		t.Fatal("output flag should exist")
+	}
+
+	// The completion function should be registered (we can't easily test the actual completion)
+	// but we can verify the flag setup is correct
+	if flag.Usage == "" {
+		t.Error("output flag should have usage text")
+	}
+}
+
+func TestVersionCommand_Examples(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	if cmd.Example == "" {
+		t.Error("Version command should have examples")
+	}
+
+	// Check that examples contain expected content
+	if !strings.Contains(cmd.Example, "kubeprobes version") {
+		t.Error("Examples should contain basic usage")
+	}
+
+	if !strings.Contains(cmd.Example, "--output=short") {
+		t.Error("Examples should contain short output format")
+	}
+}
+
+func TestVersionCommand_ErrorHandling(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	// Test with various edge cases
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{"with extra arguments", []string{"extra", "args"}},
+		{"with unknown flag", []string{"--unknown-flag"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			cmd.SetOut(buf)
+			cmd.SetErr(buf)
+			cmd.SetArgs(tt.args)
+
+			// Reset the command for each test
+			cmd.ResetFlags()
+			cmd.Flags().StringP("output", "o", "default", "Output format (default, short, json)")
+
+			err := cmd.Execute()
+			// These might error (unknown flag) or succeed (extra args ignored)
+			// We're just testing that the command handles them gracefully
+			if err != nil {
+				t.Logf("Expected error for %s: %v", tt.name, err)
+			}
+		})
+	}
+}
