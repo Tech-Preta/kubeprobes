@@ -33,9 +33,21 @@ func TestVersionCommand(t *testing.T) {
 			expectError:    false,
 		},
 		{
-			name:           "help flag",
+			name:           "help flag shows improved description",
 			args:           []string{"--help"},
 			expectedOutput: "Print the version information",
+			expectError:    false,
+		},
+		{
+			name:           "help shows troubleshooting context",
+			args:           []string{"--help"},
+			expectedOutput: "useful for troubleshooting",
+			expectError:    false,
+		},
+		{
+			name:           "help shows improved examples",
+			args:           []string{"--help"},
+			expectedOutput: "Show only version number (useful for scripts)",
 			expectError:    false,
 		},
 	}
@@ -134,6 +146,12 @@ func TestVersionCommand_OutputFlag(t *testing.T) {
 
 	if flag.DefValue != "default" {
 		t.Errorf("Expected default value 'default', got %q", flag.DefValue)
+	}
+
+	// Test that output flag has improved description from our PR
+	expectedUsage := "Output format: default, short, or json"
+	if flag.Usage != expectedUsage {
+		t.Errorf("Output flag usage should be %q, got %q", expectedUsage, flag.Usage)
 	}
 }
 

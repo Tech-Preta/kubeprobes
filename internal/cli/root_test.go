@@ -16,15 +16,33 @@ func TestRootCommand(t *testing.T) {
 		expectError    bool
 	}{
 		{
-			name:           "help flag",
+			name:           "help flag shows improved description",
 			args:           []string{"--help"},
 			expectedOutput: "Kubeprobes is a CLI tool for scanning Kubernetes workloads",
+			expectError:    false,
+		},
+		{
+			name:           "help shows health check benefits",
+			args:           []string{"--help"},
+			expectedOutput: "Health check probes are critical for:",
+			expectError:    false,
+		},
+		{
+			name:           "help shows liveness probe description",
+			args:           []string{"--help"},
+			expectedOutput: "Liveness probes: Detect when to restart containers",
 			expectError:    false,
 		},
 		{
 			name:           "no args shows help",
 			args:           []string{},
 			expectedOutput: "Available Commands:",
+			expectError:    false,
+		},
+		{
+			name:           "help includes improved examples",
+			args:           []string{"--help"},
+			expectedOutput: "Quick scan of default namespace",
 			expectError:    false,
 		},
 	}
@@ -39,7 +57,28 @@ func TestRootCommand(t *testing.T) {
 missing liveness, readiness, and startup probes.
 
 Kubeprobes helps you ensure your Kubernetes workloads have proper health checks
-configured by scanning for missing liveness, readiness, and startup probes.`,
+configured by scanning for missing liveness, readiness, and startup probes.
+Proper probe configuration is essential for reliable deployments, effective load
+balancing, and early detection of application issues.
+
+Health check probes are critical for:
+  • Liveness probes: Detect when to restart containers
+  • Readiness probes: Control traffic routing to healthy containers  
+  • Startup probes: Handle slow-starting containers gracefully`,
+				Example: `  # Quick scan of default namespace
+  kubeprobes scan
+
+  # Scan with detailed recommendations
+  kubeprobes scan --recommendation
+
+  # Scan specific namespace for liveness probes only
+  kubeprobes scan --namespace my-app --probe-type liveness
+
+  # Scan using specific kubeconfig
+  kubeprobes scan --kubeconfig ~/.kube/prod-config
+
+  # Check tool version
+  kubeprobes version`,
 			}
 
 			// Add subcommands

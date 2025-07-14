@@ -55,9 +55,9 @@ func TestNewProbeScanner_Validation(t *testing.T) {
 			expectedError:  "",
 		},
 		{
-			name:           "invalid probe type",
+			name:           "invalid probe type with descriptive error",
 			probeType:      "invalid",
-			expectedError:  "invalid probe type: invalid",
+			expectedError:  "invalid probe type 'invalid'",
 		},
 	}
 
@@ -80,8 +80,58 @@ func TestNewProbeScanner_Validation(t *testing.T) {
 			}
 
 			// For valid probe types, we expect a kubernetes client error since we don't have a real cluster
-			if err != nil && !strings.Contains(err.Error(), "error creating kubernetes client") {
+			if err != nil && !strings.Contains(err.Error(), "failed to connect to Kubernetes cluster") {
 				t.Errorf("Unexpected error (expected kubernetes client error): %v", err)
+			}
+		})
+	}
+}
+
+// Test that our enhanced error messages contain helpful information
+func TestNewProbeScanner_EnhancedErrorMessages(t *testing.T) {
+	tests := []struct {
+		name          string
+		probeType     string
+		expectedParts []string
+	}{
+		{
+			name:      "invalid probe type shows descriptive error with valid options",
+			probeType: "invalid",
+			expectedParts: []string{
+				"invalid probe type 'invalid'",
+				"liveness: Checks if the container is running",
+				"readiness: Checks if the container is ready to accept traffic", 
+				"startup: Checks if the container has started successfully",
+				"Example: kubeprobes scan --probe-type liveness",
+			},
+		},
+		{
+			name:      "another invalid probe type shows same helpful format",
+			probeType: "wrong",
+			expectedParts: []string{
+				"invalid probe type 'wrong'",
+				"Valid probe types are:",
+				"liveness:",
+				"readiness:",
+				"startup:",
+				"Example:",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewProbeScanner("", "", "default", tt.probeType, false)
+
+			if err == nil {
+				t.Errorf("Expected error but got none")
+				return
+			}
+
+			for _, expectedPart := range tt.expectedParts {
+				if !strings.Contains(err.Error(), expectedPart) {
+					t.Errorf("Expected error to contain %q, got %q", expectedPart, err.Error())
+				}
 			}
 		})
 	}
@@ -211,8 +261,8 @@ func TestProbeScanner_Scan_GetPodsError(t *testing.T) {
 		return
 	}
 	
-	if !strings.Contains(err.Error(), "error listing pods") {
-		t.Errorf("Expected error to contain 'error listing pods', got %q", err.Error())
+	if !strings.Contains(err.Error(), "failed to retrieve pods from namespace") {
+		t.Errorf("Expected error to contain 'failed to retrieve pods from namespace', got %q", err.Error())
 	}
 }
 

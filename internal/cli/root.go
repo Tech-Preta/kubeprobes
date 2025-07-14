@@ -11,17 +11,27 @@ var rootCmd = &cobra.Command{
 missing liveness, readiness, and startup probes.
 
 Kubeprobes helps you ensure your Kubernetes workloads have proper health checks
-configured by scanning for missing liveness, readiness, and startup probes.`,
-	Example: `  # Scan all workloads in the default namespace
+configured by scanning for missing liveness, readiness, and startup probes.
+Proper probe configuration is essential for reliable deployments, effective load
+balancing, and early detection of application issues.
+
+Health check probes are critical for:
+  • Liveness probes: Detect when to restart containers
+  • Readiness probes: Control traffic routing to healthy containers  
+  • Startup probes: Handle slow-starting containers gracefully`,
+	Example: `  # Quick scan of default namespace
   kubeprobes scan
 
-  # Scan with recommendations for missing probes
+  # Scan with detailed recommendations
   kubeprobes scan --recommendation
 
-  # Scan a specific namespace for liveness probes only
+  # Scan specific namespace for liveness probes only
   kubeprobes scan --namespace my-app --probe-type liveness
 
-  # Show version information
+  # Scan using specific kubeconfig
+  kubeprobes scan --kubeconfig ~/.kube/prod-config
+
+  # Check tool version
   kubeprobes version`,
 }
 

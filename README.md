@@ -107,8 +107,8 @@ kubeprobes completion --help
 ```
 
 ### Códigos de saída
-- 0: Nenhum problema de probe encontrado
-- 1: Problemas de probe encontrados
+- 0: No probe issues found (Nenhum problema de probe encontrado)
+- 1: Probe issues detected (Problemas de probe encontrados)
 
 ### Comandos Disponíveis
 
@@ -118,15 +118,15 @@ kubeprobes completion --help
 
 ### Subcomando Scan - Flags
 
-- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig
-- `-c, --kubeContext`: Contexto do Kubernetes
-- `-n, --namespace`: Namespace do Kubernetes (padrão: default)
-- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup)
-- `-r, --recommendation`: Mostrar recomendações para probes ausentes
+- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig (padrão: $KUBECONFIG ou ~/.kube/config)
+- `-c, --kubeContext`: Contexto do Kubernetes para usar (padrão: contexto atual)
+- `-n, --namespace`: Namespace do Kubernetes para escanear (padrão: default)
+- `-p, --probe-type`: Tipo de probe para escanear: liveness, readiness, ou startup (padrão: todos os tipos)
+- `-r, --recommendation`: Mostrar recomendações acionáveis para probes ausentes
 
 ### Subcomando Version - Flags
 
-- `-o, --output`: Formato de saída (default, short, json)
+- `-o, --output`: Formato de saída: default, short, ou json
 
 ## Desenvolvimento
 

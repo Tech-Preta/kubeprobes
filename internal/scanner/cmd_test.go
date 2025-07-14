@@ -42,11 +42,11 @@ func TestNewScanCommand_Flags(t *testing.T) {
 		defaultValue interface{}
 		usage        string
 	}{
-		{"kubeconfig", "k", "", "path to the kubeconfig file"},
+		{"kubeconfig", "k", "", "Path to the kubeconfig file (defaults to $KUBECONFIG or ~/.kube/config)"},
 		{"kubeContext", "c", "", "Kubernetes context"},
-		{"namespace", "n", "default", "Kubernetes namespace (default: default)"},
-		{"probe-type", "p", "", "type of probe to scan for (liveness, readiness, startup)"},
-		{"recommendation", "r", false, "show recommendations for missing probes"},
+		{"namespace", "n", "default", "Kubernetes namespace to scan (default: default)"},
+		{"probe-type", "p", "", "Type of probe to scan for: liveness, readiness, or startup (default: all types)"},
+		{"recommendation", "r", false, "Show actionable recommendations for missing probes"},
 	}
 
 	for _, expected := range expectedFlags {
@@ -103,6 +103,24 @@ func TestNewScanCommand_Help(t *testing.T) {
 		t.Error("Help output should contain description")
 	}
 
+	// Test that help contains improved descriptions from our PR
+	expectedContents := []string{
+		"Scan Kubernetes workloads for missing liveness, readiness, or startup probes",
+		"This command connects to your Kubernetes cluster",
+		"Exit codes:",
+		"0: No probe issues found",
+		"1: Probe issues detected",
+		"Examples:",
+		"kubeconfig file (defaults to $KUBECONFIG or ~/.kube/config)",
+		"Show actionable recommendations for missing probes",
+	}
+
+	for _, expected := range expectedContents {
+		if !strings.Contains(output, expected) {
+			t.Errorf("Expected help text to contain %q", expected)
+		}
+	}
+
 	// Check that all flags are documented in help
 	expectedInHelp := []string{
 		"kubeconfig",
@@ -130,37 +148,37 @@ func TestNewScanCommand_FlagValidation(t *testing.T) {
 			name:        "invalid kubeconfig path",
 			args:        []string{"--kubeconfig=/nonexistent/path"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
-			name:        "invalid probe type",
+			name:        "invalid probe type shows enhanced error message",
 			args:        []string{"--probe-type=invalid"},
 			expectError: true,
-			errorMsg:    "invalid probe type",
+			errorMsg:    "invalid probe type 'invalid'",
 		},
 		{
 			name:        "valid probe type liveness",
 			args:        []string{"--probe-type=liveness", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner", // Will fail on kubeconfig, not probe type
+			errorMsg:    "failed to connect to Kubernetes cluster", // Will fail on kubeconfig, not probe type
 		},
 		{
 			name:        "valid probe type readiness",
 			args:        []string{"--probe-type=readiness", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
 			name:        "valid probe type startup",
 			args:        []string{"--probe-type=startup", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
 			name:        "case insensitive probe type",
 			args:        []string{"--probe-type=LIVENESS", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 	}
 
@@ -193,6 +211,38 @@ func TestNewScanCommand_FlagValidation(t *testing.T) {
 	}
 }
 
+// Test that examples are present and useful (from our PR improvements)
+func TestNewScanCommand_Examples(t *testing.T) {
+	cmd := NewScanCommand()
+
+	// Capture help output
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+	cmd.SetErr(buf)
+	cmd.SetArgs([]string{"--help"})
+
+	err := cmd.Execute()
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	output := buf.String()
+
+	// Test that examples are present and useful
+	expectedExamples := []string{
+		"kubeprobes scan",
+		"kubeprobes scan --recommendation",
+		"kubeprobes scan --namespace my-app --probe-type liveness",
+		"kubeprobes scan --kubeconfig ~/.kube/config",
+		"kubeprobes scan --kubeContext production",
+	}
+
+	for _, example := range expectedExamples {
+		if !strings.Contains(output, example) {
+			t.Errorf("Expected help text to contain example %q", example)
+		}
+	}
+}
 func TestNewScanCommand_FlagParsing(t *testing.T) {
 	tests := []struct {
 		name     string
