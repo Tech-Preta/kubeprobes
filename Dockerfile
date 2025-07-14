@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes ./cmd/kubeprobes
 
 # Final stage
-FROM cgr.dev/chainguard/static:latest
+FROM cgr.dev/chainguard/static:20241227
 
 # Create a non-root user
 # Note: chainguard/static already includes a non-root user 'nonroot' with UID 65532

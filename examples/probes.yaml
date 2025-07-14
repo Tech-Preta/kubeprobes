@@ -13,7 +13,7 @@ spec:
       type: RuntimeDefault
   containers:
     - name: my-app-container
-      image: nginx:1.28.0
+      image: nginx@sha256:67682bda769fae1ccf5183192b8daf37b64cae99c6c3becf45a204155c30c7a8
       imagePullPolicy: Always
       resources:
         requests:
