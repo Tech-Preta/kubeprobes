@@ -43,6 +43,17 @@ docker run --rm --network=host \
   kubeprobes:1.2.0 scan --kubeconfig /kubeconfig
 ```
 
+### Usando variável de ambiente KUBECONFIG
+
+Alternativamente, você pode usar a variável de ambiente KUBECONFIG:
+
+```sh
+docker run --rm --network=host \
+  -v $HOME/.kube/config:/kubeconfig:ro \
+  -e KUBECONFIG=/kubeconfig \
+  kubeprobes:1.2.0 scan
+```
+
 ### Analisar um namespace específico
 
 ```sh
