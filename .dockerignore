@@ -8,6 +8,7 @@ Dockerfile
 
 # Binaries
 kubeprobes
+bin/
 *.exe
 *.exe~
 *.dll
@@ -28,4 +29,9 @@ kubeprobes
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Development
+vendor/
+*.tmp
+*.log
