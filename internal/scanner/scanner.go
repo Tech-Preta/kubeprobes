@@ -79,7 +79,7 @@ func (ps *ProbeScanner) Scan(ctx context.Context) error {
 	}
 
 	if len(pods.Items) == 0 {
-		fmt.Printf("ℹ️  No pods found in namespace '%s'\n\nSuggestions:\n  - Check if pods exist: kubectl get pods --namespace %s\n  - Try scanning a different namespace: kubeprobes scan --namespace <namespace>\n  - List all namespaces: kubectl get namespaces\n", ps.namespace, ps.namespace)
+		fmt.Fprintf(ps.writer, "ℹ️  No pods found in namespace '%s'\n\nSuggestions:\n  - Check if pods exist: kubectl get pods --namespace %s\n  - Try scanning a different namespace: kubeprobes scan --namespace <namespace>\n  - List all namespaces: kubectl get namespaces\n", ps.namespace, ps.namespace)
 		return nil
 	}
 
