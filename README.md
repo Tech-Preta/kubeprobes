@@ -59,36 +59,290 @@ kubeprobes --help
 
 ## Uso
 
+O kubeprobes oferece diferentes subcomandos para facilitar o uso e organização das tarefas e segue as **convenções de linha de comando POSIX** para máxima compatibilidade e usabilidade.
+
+### Sintaxe POSIX Suportada
+
+O kubeprobes é totalmente compatível com a sintaxe de linha de comando POSIX, incluindo:
+
+- **Flags curtas e longas**: `-h` e `--help`, `-n` e `--namespace`
+- **Agrupamento de flags curtas**: `-rp liveness` (equivale a `-r -p liveness`)
+- **Ordem flexível**: flags podem aparecer em qualquer ordem
+- **Sintaxe com equals**: `--namespace=test` ou `--namespace test`
+- **Mistura de estilos**: `-r --namespace test -p readiness`
+
+### Comando Scan
+
 ```bash
 # Verificar todos os tipos de probes no namespace padrão
 kubeprobes scan
 
 # Verificar um tipo específico de probe com recomendações
-kubeprobes scan -p liveness -r
+kubeprobes scan --probe-type liveness --recommendation
+
+# Sintaxe POSIX: flags curtas agrupadas
+kubeprobes scan -rp liveness
+
+# Sintaxe POSIX: ordem flexível de flags
+kubeprobes scan -r --namespace test -p readiness
+
+# Sintaxe POSIX: usando equals
+kubeprobes scan --namespace=meu-namespace --probe-type=startup
 
 # Verificar em um namespace específico
-kubeprobes scan -n meu-namespace
+kubeprobes scan --namespace meu-namespace
 
 # Usar um kubeconfig e contexto específicos
-kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
+kubeprobes scan --kubeconfig /path/to/kubeconfig --kubeContext meu-contexto
 
-# Exemplo completo:
-kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <namespace> -p <tipo-de-probe> -r
+# Exemplo completo com todas as opções usando sintaxe mista:
+kubeprobes scan -k <caminho-para-o-kubeconfig> --kubeContext=<contexto-kubeconfig> -n <namespace> --probe-type=<tipo-de-probe> -r
+```
+
+### Comando Version
+
+```bash
+# Mostrar informações de versão detalhadas
+kubeprobes version
+
+# Mostrar apenas a versão (útil para scripts)
+kubeprobes version --output=short
+
+# Sintaxe POSIX: flag curta
+kubeprobes version -o short
+
+# Mostrar informações em formato JSON
+kubeprobes version --output=json
+
+# Sintaxe POSIX: flag curta com equals
+kubeprobes version -o=json
+```
+
+### Comando Completion
+
+```bash
+# Gerar script de autocompletion para bash
+kubeprobes completion bash
+
+# Gerar script de autocompletion para zsh
+kubeprobes completion zsh
+
+# Ver ajuda sobre completion
+kubeprobes completion --help
 ```
 
 ### Códigos de saída
-- 0: Nenhum problema de probe encontrado
-- 1: Problemas de probe encontrados
+- 0: No probe issues found (Nenhum problema de probe encontrado)
+- 1: Probe issues detected (Problemas de probe encontrados)
 
 ### Comandos Disponíveis
-- `scan`: Escaneia workloads do Kubernetes em busca de probes.
 
-### Flags
-- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
-- `-c, --kubeContext`: Contexto do Kubernetes.
-- `-n, --namespace`: Namespace do Kubernetes.
-- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
-- `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
+- `scan`: Escaneia workloads do Kubernetes em busca de probes
+- `version`: Exibe informações de versão do kubeprobes  
+- `completion`: Gera scripts de autocompletion para diferentes shells
+
+### Subcomando Scan - Flags
+
+- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig (padrão: $KUBECONFIG ou ~/.kube/config)
+- `-c, --kubeContext`: Contexto do Kubernetes para usar (padrão: contexto atual)
+- `-n, --namespace`: Namespace do Kubernetes para escanear (padrão: default)
+- `-p, --probe-type`: Tipo de probe para escanear: liveness, readiness, ou startup (padrão: todos os tipos)
+- `-r, --recommendation`: Mostrar recomendações acionáveis para probes ausentes
+
+#### Exemplos de Sintaxe POSIX
+
+```bash
+# Flags curtas agrupadas
+kubeprobes scan -rp liveness -n production
+
+# Mistura de flags curtas e longas
+kubeprobes scan -r --namespace production --probe-type startup
+
+# Sintaxe com equals
+kubeprobes scan --namespace=test --probe-type=readiness
+
+# Ordem flexível
+kubeprobes scan --recommendation -n test -p liveness -k ~/.kube/config
+```
+
+### Subcomando Version - Flags
+
+- `-o, --output`: Formato de saída: default, short, ou json
+
+#### Exemplos de Sintaxe POSIX
+
+```bash
+# Flag curta
+kubeprobes version -o short
+
+# Flag longa  
+kubeprobes version --output json
+
+# Sintaxe com equals
+kubeprobes version --output=json
+kubeprobes version -o=short
+```
+
+## Compatibilidade POSIX
+
+O kubeprobes segue rigorosamente as **convenções de linha de comando POSIX**, garantindo máxima compatibilidade e facilidade de uso em sistemas Unix-like. Isso inclui:
+
+### Características POSIX Suportadas
+
+- **Flags curtas e longas**: Cada flag possui uma versão curta (`-h`) e longa (`--help`)
+- **Agrupamento de flags curtas**: Flags booleanas podem ser agrupadas (ex: `-rp` = `-r -p`)
+- **Ordem flexível**: Flags podem aparecer em qualquer ordem na linha de comando
+- **Sintaxe com equals**: Suporte para `--flag=valor` além de `--flag valor`
+- **Convenções padrão**: Flags como `-h/--help` seguem convenções universais
+
+### Exemplos de Uso POSIX
+
+```bash
+# Flags agrupadas - equivalem aos comandos separados
+kubeprobes scan -rp liveness          # = kubeprobes scan -r -p liveness
+kubeprobes scan -rn production        # = kubeprobes scan -r -n production
+
+# Ordem flexível - todos são equivalentes
+kubeprobes scan -r --namespace test -p readiness
+kubeprobes scan --probe-type readiness -r -n test  
+kubeprobes scan -n test -p readiness --recommendation
+
+# Sintaxe com equals
+kubeprobes scan --namespace=production --probe-type=startup
+kubeprobes version --output=json
+
+# Mistura de estilos
+kubeprobes scan -r --namespace=test -p startup -k ~/.kube/config
+```
+
+### Benefícios da Compatibilidade POSIX
+
+- **Familiarity**: Comportamento consistente com outras ferramentas CLI
+- **Scripting**: Facilita automação e integração em scripts
+- **Usabilidade**: Sintaxe intuitiva para usuários experientes em linha de comando
+- **Portabilidade**: Funciona da mesma forma em diferentes sistemas Unix-like
+
+## Desenvolvimento
+
+### Executando Testes
+
+Este projeto inclui testes unitários abrangentes para garantir a qualidade do código e evitar regressões.
+
+#### Executar todos os testes:
+
+```bash
+make test
+```
+
+#### Executar testes com cobertura:
+
+```bash
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+```
+
+#### Executar testes de um pacote específico:
+
+```bash
+# Testes do scanner
+go test -v ./internal/scanner/
+
+# Testes do cliente Kubernetes
+go test -v ./pkg/kubernetes/
+
+# Testes da CLI
+go test -v ./internal/cli/
+```
+
+#### Executar testes em modo verboso:
+
+```bash
+go test -v ./...
+```
+
+### Estrutura dos Testes
+
+Os testes seguem as convenções do Go e estão organizados em arquivos `*_test.go` ao lado do código fonte:
+
+- `internal/cli/*_test.go` - Testes para comandos da CLI
+- `internal/scanner/*_test.go` - Testes para lógica de escaneamento
+- `pkg/kubernetes/*_test.go` - Testes para cliente Kubernetes
+- `cmd/kubeprobes/*_test.go` - Testes para função main
+
+### Cobertura de Testes
+
+O projeto mantém uma cobertura de testes superior a 75%, incluindo:
+
+- **Cenários de sucesso**: Entradas válidas, diferentes tipos de probe, várias configurações
+- **Cenários de erro**: Configurações inválidas, erros de rede, falhas da API
+- **Casos extremos**: Namespaces vazios, probes ausentes, grandes conjuntos de dados
+- **Dependências mockadas**: Chamadas da API Kubernetes para evitar necessidade de cluster
+
+## Auto-completion
+
+O kubeprobes oferece suporte a auto-completion para bash, zsh, fish e PowerShell.
+
+> Para instruções detalhadas de instalação e configuração, consulte a [documentação de auto-completion](docs/completion.md).
+
+### Bash
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+source <(kubeprobes completion bash)
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+# Linux
+kubeprobes completion bash > /etc/bash_completion.d/kubeprobes
+
+# macOS
+kubeprobes completion bash > $(brew --prefix)/etc/bash_completion.d/kubeprobes
+```
+
+### Zsh
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+source <(kubeprobes completion zsh)
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+# Linux
+kubeprobes completion zsh > "${fpath[1]}/_kubeprobes"
+
+# macOS
+kubeprobes completion zsh > $(brew --prefix)/share/zsh/site-functions/_kubeprobes
+```
+
+### Fish
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+kubeprobes completion fish | source
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+kubeprobes completion fish > ~/.config/fish/completions/kubeprobes.fish
+```
+
+### PowerShell
+
+Para carregar auto-completion na sua sessão atual:
+
+```powershell
+kubeprobes completion powershell | Out-String | Invoke-Expression
+```
+
+Para carregar auto-completion permanentemente, adicione a saída do comando acima ao seu perfil do PowerShell.
 
 ## Segurança
 
