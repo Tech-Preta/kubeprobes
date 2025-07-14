@@ -61,13 +61,13 @@ dockers:
       - pkg/
     use: buildx
     build_flag_templates:
-      - "--platform=linux/amd64"
+      - "--platform={{ .Platform }}"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
       - "--label=org.opencontainers.image.description=Kubernetes health checks and probe analysis tool"
       - "--label=org.opencontainers.image.url=https://github.com/Tech-Preta/kubeprobes"
       - "--label=org.opencontainers.image.source=https://github.com/Tech-Preta/kubeprobes"
       - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.licenses=Apache-2.0"
 
