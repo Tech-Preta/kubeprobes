@@ -33,9 +33,21 @@ func TestVersionCommand(t *testing.T) {
 			expectError:    false,
 		},
 		{
-			name:           "help flag",
+			name:           "help flag shows improved description",
 			args:           []string{"--help"},
 			expectedOutput: "Print the version information",
+			expectError:    false,
+		},
+		{
+			name:           "help shows troubleshooting context",
+			args:           []string{"--help"},
+			expectedOutput: "useful for troubleshooting",
+			expectError:    false,
+		},
+		{
+			name:           "help shows improved examples",
+			args:           []string{"--help"},
+			expectedOutput: "Show only version number (useful for scripts)",
 			expectError:    false,
 		},
 	}
@@ -116,5 +128,20 @@ func TestVersionCommandInvalidOutput(t *testing.T) {
 	output := buf.String()
 	if !strings.Contains(output, "kubeprobes version") {
 		t.Errorf("Expected default output format for invalid output flag")
+	}
+}
+
+func TestVersionCommandFlagDescriptions(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	// Test that output flag has improved description
+	outputFlag := cmd.Flag("output")
+	if outputFlag == nil {
+		t.Fatal("output flag should exist")
+	}
+
+	expectedUsage := "Output format: default, short, or json"
+	if outputFlag.Usage != expectedUsage {
+		t.Errorf("Output flag usage should be %q, got %q", expectedUsage, outputFlag.Usage)
 	}
 }

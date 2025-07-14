@@ -40,12 +40,12 @@ func NewProbeScanner(kubeconfig, kubeContext, namespace, probeType string, recom
 
 	probeType = strings.ToLower(probeType)
 	if !validProbeTypes[probeType] {
-		return nil, fmt.Errorf("invalid probe type: %s. Valid types are: liveness, readiness, startup", probeType)
+		return nil, fmt.Errorf("invalid probe type '%s'\n\nValid probe types are:\n  - liveness: Checks if the container is running\n  - readiness: Checks if the container is ready to accept traffic\n  - startup: Checks if the container has started successfully\n\nExample: kubeprobes scan --probe-type liveness", probeType)
 	}
 
 	kubeClient, err := kubernetes.NewClient(kubeconfig, kubeContext)
 	if err != nil {
-		return nil, fmt.Errorf("error creating kubernetes client: %w", err)
+		return nil, fmt.Errorf("failed to connect to Kubernetes cluster: %w\n\nTroubleshooting tips:\n  - Ensure kubectl is configured and working: kubectl cluster-info\n  - Check kubeconfig file exists and is readable\n  - Verify the specified context exists: kubectl config get-contexts\n  - Try without specifying kubeconfig to use default: kubeprobes scan", err)
 	}
 
 	return &ProbeScanner{
@@ -60,44 +60,50 @@ func NewProbeScanner(kubeconfig, kubeContext, namespace, probeType string, recom
 func (ps *ProbeScanner) Scan(ctx context.Context) error {
 	pods, err := ps.kubeClient.GetPods(ctx, ps.namespace)
 	if err != nil {
-		return fmt.Errorf("error listing pods: %w", err)
+		return fmt.Errorf("failed to retrieve pods from namespace '%s': %w\n\nTroubleshooting tips:\n  - Verify the namespace exists: kubectl get namespaces\n  - Check if you have permissions: kubectl auth can-i get pods --namespace %s\n  - Ensure cluster connection is working: kubectl cluster-info", ps.namespace, err, ps.namespace)
 	}
 
 	if len(pods.Items) == 0 {
-		fmt.Printf("No pods found in namespace %s\n", ps.namespace)
+		fmt.Printf("ℹ️  No pods found in namespace '%s'\n\nSuggestions:\n  - Check if pods exist: kubectl get pods --namespace %s\n  - Try scanning a different namespace: kubeprobes scan --namespace <namespace>\n  - List all namespaces: kubectl get namespaces\n", ps.namespace, ps.namespace)
 		return nil
 	}
 
 	issuesFound := false
+	scannedContainers := 0
+	
 	for _, pod := range pods.Items {
 		for _, container := range pod.Spec.Containers {
+			scannedContainers++
 			if ps.probeType == "liveness" || ps.probeType == "" {
 				if container.LivenessProbe == nil {
 					issuesFound = true
-					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a liveness probe\n",
+					fmt.Printf("⚠️  [MISSING LIVENESS PROBE] Pod %s/%s (container: %s)\n",
 						pod.Namespace, pod.Name, container.Name)
 					if ps.recommendation {
-						fmt.Println("  Recommendation: Add a liveness probe to ensure the container is running correctly.")
+						fmt.Printf("   💡 Recommendation: Add a liveness probe to detect if the container becomes unresponsive.\n")
+						fmt.Printf("      Example: HTTP check on /health endpoint or exec command like 'ps aux | grep myapp'\n")
 					}
 				}
 			}
 			if ps.probeType == "readiness" || ps.probeType == "" {
 				if container.ReadinessProbe == nil {
 					issuesFound = true
-					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a readiness probe\n",
+					fmt.Printf("⚠️  [MISSING READINESS PROBE] Pod %s/%s (container: %s)\n",
 						pod.Namespace, pod.Name, container.Name)
 					if ps.recommendation {
-						fmt.Println("  Recommendation: Add a readiness probe to ensure the container is ready to accept traffic.")
+						fmt.Printf("   💡 Recommendation: Add a readiness probe to ensure container is ready before receiving traffic.\n")
+						fmt.Printf("      Example: HTTP check on /ready endpoint or TCP socket check on application port\n")
 					}
 				}
 			}
 			if ps.probeType == "startup" || ps.probeType == "" {
 				if container.StartupProbe == nil {
 					issuesFound = true
-					fmt.Printf("[WARNING] Pod %s/%s (container: %s) is missing a startup probe\n",
+					fmt.Printf("⚠️  [MISSING STARTUP PROBE] Pod %s/%s (container: %s)\n",
 						pod.Namespace, pod.Name, container.Name)
 					if ps.recommendation {
-						fmt.Println("  Recommendation: Add a startup probe to ensure the container has started successfully.")
+						fmt.Printf("   💡 Recommendation: Add a startup probe for slow-starting containers to avoid premature kills.\n")
+						fmt.Printf("      Example: HTTP check with longer initial delay and period for application startup\n")
 					}
 				}
 			}
@@ -105,10 +111,18 @@ func (ps *ProbeScanner) Scan(ctx context.Context) error {
 	}
 
 	if !issuesFound {
-		fmt.Printf("No probe issues found in namespace %s\n", ps.namespace)
+		fmt.Printf("✅ No probe issues found in namespace '%s' (scanned %d containers)\n", ps.namespace, scannedContainers)
+		if !ps.recommendation {
+			fmt.Printf("💡 Tip: Use --recommendation flag to see best practices for probe configuration\n")
+		}
 		return nil
 	}
 
-	fmt.Println("Issues found. Exiting with status code 1.")
-	return &ProbeIssuesFoundError{Message: "probe issues found"}
+	fmt.Printf("\n📊 Summary: Found probe issues in namespace '%s' (scanned %d containers)\n", ps.namespace, scannedContainers)
+	if !ps.recommendation {
+		fmt.Printf("💡 Tip: Run with --recommendation flag to get actionable suggestions\n")
+	}
+	fmt.Printf("📚 Learn more: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/\n")
+	
+	return &ProbeIssuesFoundError{Message: "probe issues detected"}
 }

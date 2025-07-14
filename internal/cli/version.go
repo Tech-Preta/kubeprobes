@@ -24,16 +24,20 @@ func NewVersionCommand() *cobra.Command {
 		Long: `Print the version information of kubeprobes.
 
 This command displays the version, commit hash, build date, and Go version
-used to build this binary.`,
-		Example: `  # Show version information
+used to build this binary. This information is useful for troubleshooting
+and ensuring you're running the expected version.`,
+		Example: `  # Show detailed version information  
   kubeprobes version
 
-  # Show version in a script-friendly format
-  kubeprobes version --output=short`,
+  # Show only version number (useful for scripts)
+  kubeprobes version --output=short
+
+  # Show version information as JSON
+  kubeprobes version --output=json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			output, err := cmd.Flags().GetString("output")
 			if err != nil {
-				return fmt.Errorf("error getting output flag: %w", err)
+				return fmt.Errorf("failed to read output flag: %w", err)
 			}
 
 			switch output {
@@ -53,7 +57,7 @@ used to build this binary.`,
 		},
 	}
 
-	cmd.Flags().StringP("output", "o", "default", "Output format (default, short, json)")
+	cmd.Flags().StringP("output", "o", "default", "Output format: default, short, or json")
 
 	// Add custom completion for output flag
 	err := cmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
