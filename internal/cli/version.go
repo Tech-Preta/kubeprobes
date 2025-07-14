@@ -32,8 +32,14 @@ and ensuring you're running the expected version.`,
   # Show only version number (useful for scripts)
   kubeprobes version --output=short
 
+  # POSIX syntax: short flag
+  kubeprobes version -o short
+
   # Show version information as JSON
-  kubeprobes version --output=json`,
+  kubeprobes version --output=json
+
+  # POSIX syntax: short flag with equals
+  kubeprobes version -o=json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			output, err := cmd.Flags().GetString("output")
 			if err != nil {

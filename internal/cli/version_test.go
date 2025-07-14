@@ -220,3 +220,99 @@ func TestVersionCommand_ErrorHandling(t *testing.T) {
 		})
 	}
 }
+
+// TestVersionCommandPOSIXCompliance tests POSIX compliance for version command
+func TestVersionCommandPOSIXCompliance(t *testing.T) {
+	tests := []struct {
+		name        string
+		args        []string
+		description string
+	}{
+		{
+			name:        "short_flag",
+			args:        []string{"-o", "short"},
+			description: "Should support short flag syntax",
+		},
+		{
+			name:        "long_flag",
+			args:        []string{"--output", "json"},
+			description: "Should support long flag syntax",
+		},
+		{
+			name:        "equals_syntax",
+			args:        []string{"--output=short"},
+			description: "Should support --flag=value syntax",
+		},
+		{
+			name:        "help_short",
+			args:        []string{"-h"},
+			description: "Should support standard -h help flag",
+		},
+		{
+			name:        "help_long",
+			args:        []string{"--help"},
+			description: "Should support standard --help flag",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := NewVersionCommand()
+
+			buf := new(bytes.Buffer)
+			cmd.SetOut(buf)
+			cmd.SetErr(buf)
+			cmd.SetArgs(tt.args)
+
+			err := cmd.Execute()
+			if err != nil {
+				t.Errorf("POSIX syntax test failed for %s: %v", tt.description, err)
+			}
+
+			output := buf.String()
+
+			// Verify that output was produced for non-help commands
+			if !strings.Contains(tt.name, "help") && len(output) == 0 {
+				t.Errorf("Expected output for %s", tt.description)
+			}
+
+			// Verify help commands produce help output
+			if strings.Contains(tt.name, "help") && !strings.Contains(output, "Print the version information") {
+				t.Errorf("Help command should produce help output")
+			}
+		})
+	}
+}
+
+// TestVersionCommandFlagConventions tests version command flag conventions
+func TestVersionCommandFlagConventions(t *testing.T) {
+	cmd := NewVersionCommand()
+
+	// Test output flag conventions
+	outputFlag := cmd.Flags().Lookup("output")
+	if outputFlag == nil {
+		t.Fatal("Output flag should exist")
+	}
+
+	if outputFlag.Shorthand != "o" {
+		t.Errorf("Output flag should have shorthand 'o', got %q", outputFlag.Shorthand)
+	}
+
+	// Test that help shows POSIX format
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+	cmd.SetErr(buf)
+	cmd.SetArgs([]string{"--help"})
+
+	err := cmd.Execute()
+	if err != nil {
+		t.Fatalf("Help command failed: %v", err)
+	}
+
+	output := buf.String()
+
+	// Should show both short and long flag forms
+	if !strings.Contains(output, "-o, --output") {
+		t.Error("Help should show both short and long flag forms")
+	}
+}

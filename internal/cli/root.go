@@ -18,12 +18,22 @@ balancing, and early detection of application issues.
 Health check probes are critical for:
   • Liveness probes: Detect when to restart containers
   • Readiness probes: Control traffic routing to healthy containers  
-  • Startup probes: Handle slow-starting containers gracefully`,
+  • Startup probes: Handle slow-starting containers gracefully
+
+POSIX Compliance:
+This CLI follows POSIX command line conventions including grouped short flags,
+flexible flag ordering, and both --flag=value and --flag value syntax.`,
 	Example: `  # Quick scan of default namespace
   kubeprobes scan
 
   # Scan with detailed recommendations
   kubeprobes scan --recommendation
+
+  # POSIX syntax: grouped short flags
+  kubeprobes scan -rp liveness
+
+  # POSIX syntax: flexible flag order
+  kubeprobes scan -r --namespace test -p readiness
 
   # Scan specific namespace for liveness probes only
   kubeprobes scan --namespace my-app --probe-type liveness
