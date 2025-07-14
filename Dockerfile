@@ -1,6 +1,9 @@
 # Build stage
 FROM golang:1.24-alpine AS builder
 
+# Install ca-certificates for HTTPS requests during build
+RUN apk --no-cache add ca-certificates
+
 WORKDIR /app
 
 # Copy everything first
@@ -10,7 +13,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes ./cmd/kubeprobes
 
 # Final stage - using alpine for better compatibility
-FROM alpine:latest
+FROM alpine:3.22.0
 
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates
