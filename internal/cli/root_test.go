@@ -212,3 +212,124 @@ func TestRootCommand_Examples(t *testing.T) {
 		}
 	}
 }
+
+// TestPOSIXCompliance tests POSIX command line syntax compliance
+func TestPOSIXCompliance(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		desc string
+	}{
+		{
+			name: "grouped_short_flags",
+			args: []string{"scan", "-rp", "liveness"},
+			desc: "Should support grouped short flags (-rp instead of -r -p)",
+		},
+		{
+			name: "mixed_flag_order",
+			args: []string{"scan", "-r", "--namespace", "test", "-p", "readiness"},
+			desc: "Should support flexible flag ordering",
+		},
+		{
+			name: "short_flags_first",
+			args: []string{"scan", "-n", "test", "-k", "/path/to/config", "--recommendation"},
+			desc: "Should support short flags before long flags",
+		},
+		{
+			name: "long_flags_first", 
+			args: []string{"scan", "--recommendation", "--probe-type", "startup", "-n", "test"},
+			desc: "Should support long flags before short flags",
+		},
+		{
+			name: "equals_syntax",
+			args: []string{"scan", "--namespace=test", "--probe-type=liveness"},
+			desc: "Should support --flag=value syntax",
+		},
+		{
+			name: "help_short_flag",
+			args: []string{"-h"},
+			desc: "Should support standard -h help flag",
+		},
+		{
+			name: "help_long_flag",
+			args: []string{"--help"},
+			desc: "Should support standard --help flag",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create fresh command for each test
+			cmd := &cobra.Command{
+				Use:   "kubeprobes",
+				Short: "Kubeprobes is a CLI tool for scanning Kubernetes probes",
+			}
+			cmd.AddCommand(NewScanCommand())
+			cmd.AddCommand(NewVersionCommand())
+
+			// Capture output
+			buf := new(bytes.Buffer)
+			cmd.SetOut(buf)
+			cmd.SetErr(buf)
+			cmd.SetArgs(tt.args)
+
+			// Execute - we expect most to fail due to no k8s cluster, 
+			// but flags should be parsed correctly
+			err := cmd.Execute()
+			
+			// For help flags, we don't expect errors
+			if tt.name == "help_short_flag" || tt.name == "help_long_flag" {
+				if err != nil {
+					t.Errorf("Test %q failed with error: %v", tt.desc, err)
+				}
+				return
+			}
+
+			// For scan commands, check that flag parsing didn't fail
+			// (cluster connection errors are expected and OK)
+			output := buf.String()
+			if strings.Contains(output, "unknown flag") || strings.Contains(output, "unknown shorthand") {
+				t.Errorf("Test %q failed - flag parsing error: %s", tt.desc, output)
+			}
+		})
+	}
+}
+
+// TestPOSIXFlagCompatibility tests specific POSIX flag compatibility
+func TestPOSIXFlagCompatibility(t *testing.T) {
+	scanCmd := NewScanCommand()
+	
+	tests := []struct {
+		name       string
+		shortFlag  string
+		longFlag   string
+		expectBoth bool
+	}{
+		{"kubeconfig", "k", "kubeconfig", true},
+		{"kubeContext", "c", "kubeContext", true},
+		{"namespace", "n", "namespace", true},
+		{"probe-type", "p", "probe-type", true},
+		{"recommendation", "r", "recommendation", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			shortFlag := scanCmd.Flags().ShorthandLookup(tt.shortFlag)
+			longFlag := scanCmd.Flags().Lookup(tt.longFlag)
+
+			if tt.expectBoth {
+				if shortFlag == nil {
+					t.Errorf("Expected short flag -%s to exist", tt.shortFlag)
+				}
+				if longFlag == nil {
+					t.Errorf("Expected long flag --%s to exist", tt.longFlag)
+				}
+				
+				// Verify they're the same flag
+				if shortFlag != nil && longFlag != nil && shortFlag != longFlag {
+					t.Errorf("Short flag -%s and long flag --%s should be the same flag", tt.shortFlag, tt.longFlag)
+				}
+			}
+		})
+	}
+}

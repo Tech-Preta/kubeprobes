@@ -27,6 +27,12 @@ Exit codes:
   # Scan with recommendations for missing probes
   kubeprobes scan --recommendation
 
+  # POSIX syntax: grouped short flags
+  kubeprobes scan -rp liveness
+
+  # POSIX syntax: flexible flag order  
+  kubeprobes scan -r --namespace test -p readiness
+
   # Scan a specific namespace for liveness probes only
   kubeprobes scan --namespace my-app --probe-type liveness
 
@@ -34,7 +40,10 @@ Exit codes:
   kubeprobes scan --kubeconfig ~/.kube/config
 
   # Scan with a specific Kubernetes context
-  kubeprobes scan --kubeContext production`,
+  kubeprobes scan --kubeContext production
+
+  # POSIX syntax: using equals notation
+  kubeprobes scan --namespace=production --probe-type=startup`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 			if err != nil {

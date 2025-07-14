@@ -59,7 +59,17 @@ kubeprobes --help
 
 ## Uso
 
-O kubeprobes oferece diferentes subcomandos para facilitar o uso e organização das tarefas:
+O kubeprobes oferece diferentes subcomandos para facilitar o uso e organização das tarefas e segue as **convenções de linha de comando POSIX** para máxima compatibilidade e usabilidade.
+
+### Sintaxe POSIX Suportada
+
+O kubeprobes é totalmente compatível com a sintaxe de linha de comando POSIX, incluindo:
+
+- **Flags curtas e longas**: `-h` e `--help`, `-n` e `--namespace`
+- **Agrupamento de flags curtas**: `-rp liveness` (equivale a `-r -p liveness`)
+- **Ordem flexível**: flags podem aparecer em qualquer ordem
+- **Sintaxe com equals**: `--namespace=test` ou `--namespace test`
+- **Mistura de estilos**: `-r --namespace test -p readiness`
 
 ### Comando Scan
 
@@ -70,14 +80,23 @@ kubeprobes scan
 # Verificar um tipo específico de probe com recomendações
 kubeprobes scan --probe-type liveness --recommendation
 
+# Sintaxe POSIX: flags curtas agrupadas
+kubeprobes scan -rp liveness
+
+# Sintaxe POSIX: ordem flexível de flags
+kubeprobes scan -r --namespace test -p readiness
+
+# Sintaxe POSIX: usando equals
+kubeprobes scan --namespace=meu-namespace --probe-type=startup
+
 # Verificar em um namespace específico
 kubeprobes scan --namespace meu-namespace
 
 # Usar um kubeconfig e contexto específicos
 kubeprobes scan --kubeconfig /path/to/kubeconfig --kubeContext meu-contexto
 
-# Exemplo completo com todas as opções:
-kubeprobes scan --kubeconfig <caminho-para-o-kubeconfig> --kubeContext <contexto-kubeconfig> --namespace <namespace> --probe-type <tipo-de-probe> --recommendation
+# Exemplo completo com todas as opções usando sintaxe mista:
+kubeprobes scan -k <caminho-para-o-kubeconfig> --kubeContext=<contexto-kubeconfig> -n <namespace> --probe-type=<tipo-de-probe> -r
 ```
 
 ### Comando Version
@@ -89,8 +108,14 @@ kubeprobes version
 # Mostrar apenas a versão (útil para scripts)
 kubeprobes version --output=short
 
+# Sintaxe POSIX: flag curta
+kubeprobes version -o short
+
 # Mostrar informações em formato JSON
 kubeprobes version --output=json
+
+# Sintaxe POSIX: flag curta com equals
+kubeprobes version -o=json
 ```
 
 ### Comando Completion
@@ -124,9 +149,78 @@ kubeprobes completion --help
 - `-p, --probe-type`: Tipo de probe para escanear: liveness, readiness, ou startup (padrão: todos os tipos)
 - `-r, --recommendation`: Mostrar recomendações acionáveis para probes ausentes
 
+#### Exemplos de Sintaxe POSIX
+
+```bash
+# Flags curtas agrupadas
+kubeprobes scan -rp liveness -n production
+
+# Mistura de flags curtas e longas
+kubeprobes scan -r --namespace production --probe-type startup
+
+# Sintaxe com equals
+kubeprobes scan --namespace=test --probe-type=readiness
+
+# Ordem flexível
+kubeprobes scan --recommendation -n test -p liveness -k ~/.kube/config
+```
+
 ### Subcomando Version - Flags
 
 - `-o, --output`: Formato de saída: default, short, ou json
+
+#### Exemplos de Sintaxe POSIX
+
+```bash
+# Flag curta
+kubeprobes version -o short
+
+# Flag longa  
+kubeprobes version --output json
+
+# Sintaxe com equals
+kubeprobes version --output=json
+kubeprobes version -o=short
+```
+
+## Compatibilidade POSIX
+
+O kubeprobes segue rigorosamente as **convenções de linha de comando POSIX**, garantindo máxima compatibilidade e facilidade de uso em sistemas Unix-like. Isso inclui:
+
+### Características POSIX Suportadas
+
+- **Flags curtas e longas**: Cada flag possui uma versão curta (`-h`) e longa (`--help`)
+- **Agrupamento de flags curtas**: Flags booleanas podem ser agrupadas (ex: `-rp` = `-r -p`)
+- **Ordem flexível**: Flags podem aparecer em qualquer ordem na linha de comando
+- **Sintaxe com equals**: Suporte para `--flag=valor` além de `--flag valor`
+- **Convenções padrão**: Flags como `-h/--help` seguem convenções universais
+
+### Exemplos de Uso POSIX
+
+```bash
+# Flags agrupadas - equivalem aos comandos separados
+kubeprobes scan -rp liveness          # = kubeprobes scan -r -p liveness
+kubeprobes scan -rn production        # = kubeprobes scan -r -n production
+
+# Ordem flexível - todos são equivalentes
+kubeprobes scan -r --namespace test -p readiness
+kubeprobes scan --probe-type readiness -r -n test  
+kubeprobes scan -n test -p readiness --recommendation
+
+# Sintaxe com equals
+kubeprobes scan --namespace=production --probe-type=startup
+kubeprobes version --output=json
+
+# Mistura de estilos
+kubeprobes scan -r --namespace=test -p startup -k ~/.kube/config
+```
+
+### Benefícios da Compatibilidade POSIX
+
+- **Familiarity**: Comportamento consistente com outras ferramentas CLI
+- **Scripting**: Facilita automação e integração em scripts
+- **Usabilidade**: Sintaxe intuitiva para usuários experientes em linha de comando
+- **Portabilidade**: Funciona da mesma forma em diferentes sistemas Unix-like
 
 ## Desenvolvimento
 
