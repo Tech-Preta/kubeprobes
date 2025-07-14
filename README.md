@@ -128,6 +128,62 @@ kubeprobes completion --help
 
 - `-o, --output`: Formato de saída (default, short, json)
 
+## Desenvolvimento
+
+### Executando Testes
+
+Este projeto inclui testes unitários abrangentes para garantir a qualidade do código e evitar regressões.
+
+#### Executar todos os testes:
+
+```bash
+make test
+```
+
+#### Executar testes com cobertura:
+
+```bash
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+```
+
+#### Executar testes de um pacote específico:
+
+```bash
+# Testes do scanner
+go test -v ./internal/scanner/
+
+# Testes do cliente Kubernetes
+go test -v ./pkg/kubernetes/
+
+# Testes da CLI
+go test -v ./internal/cli/
+```
+
+#### Executar testes em modo verboso:
+
+```bash
+go test -v ./...
+```
+
+### Estrutura dos Testes
+
+Os testes seguem as convenções do Go e estão organizados em arquivos `*_test.go` ao lado do código fonte:
+
+- `internal/cli/*_test.go` - Testes para comandos da CLI
+- `internal/scanner/*_test.go` - Testes para lógica de escaneamento
+- `pkg/kubernetes/*_test.go` - Testes para cliente Kubernetes
+- `cmd/kubeprobes/*_test.go` - Testes para função main
+
+### Cobertura de Testes
+
+O projeto mantém uma cobertura de testes superior a 75%, incluindo:
+
+- **Cenários de sucesso**: Entradas válidas, diferentes tipos de probe, várias configurações
+- **Cenários de erro**: Configurações inválidas, erros de rede, falhas da API
+- **Casos extremos**: Namespaces vazios, probes ausentes, grandes conjuntos de dados
+- **Dependências mockadas**: Chamadas da API Kubernetes para evitar necessidade de cluster
+
 ## Auto-completion
 
 O kubeprobes oferece suporte a auto-completion para bash, zsh, fish e PowerShell.
