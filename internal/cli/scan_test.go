@@ -61,7 +61,7 @@ func TestScanCommandFlags(t *testing.T) {
 
 	expectedFlags := []string{
 		"kubeconfig",
-		"kubeContext", 
+		"kubeContext",
 		"namespace",
 		"probe-type",
 		"recommendation",

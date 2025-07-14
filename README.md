@@ -59,21 +59,51 @@ kubeprobes --help
 
 ## Uso
 
+O kubeprobes oferece diferentes subcomandos para facilitar o uso e organização das tarefas:
+
+### Comando Scan
+
 ```bash
 # Verificar todos os tipos de probes no namespace padrão
 kubeprobes scan
 
 # Verificar um tipo específico de probe com recomendações
-kubeprobes scan -p liveness -r
+kubeprobes scan --probe-type liveness --recommendation
 
 # Verificar em um namespace específico
-kubeprobes scan -n meu-namespace
+kubeprobes scan --namespace meu-namespace
 
 # Usar um kubeconfig e contexto específicos
-kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
+kubeprobes scan --kubeconfig /path/to/kubeconfig --kubeContext meu-contexto
 
-# Exemplo completo:
-kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <namespace> -p <tipo-de-probe> -r
+# Exemplo completo com todas as opções:
+kubeprobes scan --kubeconfig <caminho-para-o-kubeconfig> --kubeContext <contexto-kubeconfig> --namespace <namespace> --probe-type <tipo-de-probe> --recommendation
+```
+
+### Comando Version
+
+```bash
+# Mostrar informações de versão detalhadas
+kubeprobes version
+
+# Mostrar apenas a versão (útil para scripts)
+kubeprobes version --output=short
+
+# Mostrar informações em formato JSON
+kubeprobes version --output=json
+```
+
+### Comando Completion
+
+```bash
+# Gerar script de autocompletion para bash
+kubeprobes completion bash
+
+# Gerar script de autocompletion para zsh
+kubeprobes completion zsh
+
+# Ver ajuda sobre completion
+kubeprobes completion --help
 ```
 
 ### Códigos de saída
@@ -81,14 +111,22 @@ kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <name
 - 1: Problemas de probe encontrados
 
 ### Comandos Disponíveis
-- `scan`: Escaneia workloads do Kubernetes em busca de probes.
 
-### Flags
-- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
-- `-c, --kubeContext`: Contexto do Kubernetes.
-- `-n, --namespace`: Namespace do Kubernetes.
-- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
-- `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
+- `scan`: Escaneia workloads do Kubernetes em busca de probes
+- `version`: Exibe informações de versão do kubeprobes  
+- `completion`: Gera scripts de autocompletion para diferentes shells
+
+### Subcomando Scan - Flags
+
+- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig
+- `-c, --kubeContext`: Contexto do Kubernetes
+- `-n, --namespace`: Namespace do Kubernetes (padrão: default)
+- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup)
+- `-r, --recommendation`: Mostrar recomendações para probes ausentes
+
+### Subcomando Version - Flags
+
+- `-o, --output`: Formato de saída (default, short, json)
 
 ## Auto-completion
 

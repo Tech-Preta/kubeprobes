@@ -41,7 +41,7 @@ missing liveness, readiness, and startup probes.
 Kubeprobes helps you ensure your Kubernetes workloads have proper health checks
 configured by scanning for missing liveness, readiness, and startup probes.`,
 			}
-			
+
 			// Add subcommands
 			cmd.AddCommand(NewScanCommand())
 			cmd.AddCommand(NewVersionCommand())
@@ -75,7 +75,7 @@ func TestSubcommandAvailability(t *testing.T) {
 		Use:   "kubeprobes",
 		Short: "Kubeprobes is a CLI tool for scanning Kubernetes probes",
 	}
-	
+
 	// Add subcommands
 	cmd.AddCommand(NewScanCommand())
 	cmd.AddCommand(NewVersionCommand())

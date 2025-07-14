@@ -82,7 +82,7 @@ func TestVersionCommandJsonOutput(t *testing.T) {
 	}
 
 	output := strings.TrimSpace(buf.String())
-	
+
 	// Verify it's valid JSON
 	var result map[string]string
 	if err := json.Unmarshal([]byte(output), &result); err != nil {
