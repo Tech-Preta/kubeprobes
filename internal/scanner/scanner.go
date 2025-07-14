@@ -79,7 +79,49 @@ func (ps *ProbeScanner) Scan(ctx context.Context) error {
 	}
 
 	if len(pods.Items) == 0 {
-		fmt.Fprintf(ps.writer, "ℹ️  No pods found in namespace '%s'\n\nSuggestions:\n  - Check if pods exist: kubectl get pods --namespace %s\n  - Try scanning a different namespace: kubeprobes scan --namespace <namespace>\n  - List all namespaces: kubectl get namespaces\n", ps.namespace, ps.namespace)
+// internal/scanner/scanner.go
+
+package scanner
+
+import (
+    "io"
+    "os"
+    "strings"
+
+    // ... other imports ...
+)
+
+// ProbeScanner handles the scanning logic
+type ProbeScanner struct {
+    kubeClient     KubernetesClient
+    namespace      string
+    probeType      string
+    recommendation bool
+    writer         io.Writer
+}
+
+func NewProbeScannerWithClient(
+    kubeClient     KubernetesClient,
+    namespace      string,
+    probeType      string,
+    recommendation bool,
+    writer         io.Writer,
+) *ProbeScanner {
+    if namespace == "" {
+        namespace = "default"
+    }
+    if writer == nil {
+        writer = os.Stdout
+    }
+
+    return &ProbeScanner{
+        kubeClient:     kubeClient,
+        namespace:      namespace,
+        probeType:      strings.ToLower(probeType),
+        recommendation: recommendation,
+        writer:         writer,
+    }
+}
 		return nil
 	}
 
