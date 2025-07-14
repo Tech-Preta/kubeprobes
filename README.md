@@ -59,6 +59,8 @@ kubeprobes --help
 
 ## Uso
 
+### Exemplos Básicos
+
 ```bash
 # Verificar todos os tipos de probes no namespace padrão
 kubeprobes scan
@@ -69,26 +71,102 @@ kubeprobes scan -p liveness -r
 # Verificar em um namespace específico
 kubeprobes scan -n meu-namespace
 
+# Verificar em todos os namespaces
+kubeprobes scan --all-namespaces
+
 # Usar um kubeconfig e contexto específicos
 kubeprobes scan -k /path/to/kubeconfig -c meu-contexto
+```
 
-# Exemplo completo:
-kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <namespace> -p <tipo-de-probe> -r
+### Exemplos com Diferentes Formatos de Saída
+
+```bash
+# Saída em formato JSON
+kubeprobes scan -o json
+
+# Saída em formato YAML
+kubeprobes scan -o yaml
+
+# Saída em formato texto (padrão) com recomendações
+kubeprobes scan -o text -r
+```
+
+### Exemplos Avançados
+
+```bash
+# Verificar liveness probes em todos os namespaces com saída JSON
+kubeprobes scan -A -p liveness -o json
+
+# Verificar todos os probes com falha em avisos (exit code 1)
+kubeprobes scan --fail-on-warn
+
+# Exemplo completo com todas as opções
+kubeprobes scan -k ~/.kube/config -c production -A -p readiness -r -o yaml -f
+
+# Verificar namespace específico com recomendações e falha em avisos
+kubeprobes scan -n kube-system -r -f
 ```
 
 ### Códigos de saída
 - 0: Nenhum problema de probe encontrado
-- 1: Problemas de probe encontrados
+- 1: Problemas de probe encontrados (sempre quando há avisos, ou quando usado `--fail-on-warn`)
+
+### Formatos de Saída
+
+#### Texto (padrão)
+```
+[WARNING] Pod default/my-app-123 (container: app) is missing liveness probe
+  Recommendation: Add a liveness probe to ensure the container is running correctly.
+```
+
+#### JSON
+```json
+{
+  "issues": [
+    {
+      "namespace": "default",
+      "podName": "my-app-123",
+      "containerName": "app",
+      "probeType": "liveness",
+      "message": "missing liveness probe",
+      "recommendation": "Add a liveness probe to ensure the container is running correctly."
+    }
+  ],
+  "summary": "Found 1 probe issues in default",
+  "namespace": "default",
+  "exitCode": 0
+}
+```
+
+#### YAML
+```yaml
+issues:
+  - namespace: default
+    podName: my-app-123
+    containerName: app
+    probeType: liveness
+    message: missing liveness probe
+    recommendation: Add a liveness probe to ensure the container is running correctly.
+summary: Found 1 probe issues in default
+namespace: default
+exitCode: 0
+```
 
 ### Comandos Disponíveis
 - `scan`: Escaneia workloads do Kubernetes em busca de probes.
 
 ### Flags
-- `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
-- `-c, --kubeContext`: Contexto do Kubernetes.
-- `-n, --namespace`: Namespace do Kubernetes.
-- `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
-- `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
+
+| Flag | Short | Description | Default | Examples |
+|------|-------|-------------|---------|----------|
+| `--kubeconfig` | `-k` | Path to the kubeconfig file. If not provided, uses default kubeconfig location | | `-k ~/.kube/config` |
+| `--kubeContext` | `-c` | Kubernetes context to use. If not provided, uses current context | | `-c production` |
+| `--namespace` | `-n` | Kubernetes namespace to scan. Use --all-namespaces to scan all namespaces | `default` | `-n kube-system` |
+| `--all-namespaces` | `-A` | Scan all namespaces instead of a specific namespace | `false` | `-A` |
+| `--probe-type` | `-p` | Type of probe to scan for: liveness, readiness, startup. If not provided, scans all types | | `-p liveness` |
+| `--recommendation` | `-r` | Show detailed recommendations for missing probes | `false` | `-r` |
+| `--output` | `-o` | Output format: text, json, or yaml | `text` | `-o json` |
+| `--fail-on-warn` | `-f` | Exit with code 1 if warnings are found (treats warnings as failures) | `false` | `-f` |
 
 ## Auto-completion
 
