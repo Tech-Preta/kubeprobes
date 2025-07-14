@@ -189,36 +189,33 @@ func TestVersionCommand_Examples(t *testing.T) {
 }
 
 func TestVersionCommand_ErrorHandling(t *testing.T) {
-	cmd := NewVersionCommand()
+    cmd := NewVersionCommand()
 
-	// Test with various edge cases
-	tests := []struct {
-		name string
-		args []string
-	}{
-		{"with extra arguments", []string{"extra", "args"}},
-		{"with unknown flag", []string{"--unknown-flag"}},
-	}
+    // Test with various edge cases
+    tests := []struct {
+        name string
+        args []string
+    }{
+        {"with extra arguments", []string{"extra", "args"}},
+        {"with unknown flag", []string{"--unknown-flag"}},
+    }
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			buf := new(bytes.Buffer)
-			cmd.SetOut(buf)
-			cmd.SetErr(buf)
-			cmd.SetArgs(tt.args)
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            cmd := NewVersionCommand() // Nova instância para cada teste
+            buf := new(bytes.Buffer)
+            cmd.SetOut(buf)
+            cmd.SetErr(buf)
+            cmd.SetArgs(tt.args)
 
-			// Reset the command for each test
-			cmd.ResetFlags()
-			cmd.Flags().StringP("output", "o", "default", "Output format (default, short, json)")
-
-			err := cmd.Execute()
-			// These might error (unknown flag) or succeed (extra args ignored)
-			// We're just testing that the command handles them gracefully
-			if err != nil {
-				t.Logf("Expected error for %s: %v", tt.name, err)
-			}
-		})
-	}
+            err := cmd.Execute()
+            // These might error (unknown flag) or succeed (extra args ignored)
+            // We're just testing that the command handles them gracefully
+            if err != nil {
+                t.Logf("Expected error for %s: %v", tt.name, err)
+            }
+        })
+    }
 }
 
 // TestVersionCommandPOSIXCompliance tests POSIX compliance for version command
