@@ -1,9 +1,15 @@
+project_name: kubeprobes
+
 before:
   hooks:
     - go mod tidy
+    - go mod download
 
 builds:
-  - env:
+  - id: kubeprobes
+    main: ./cmd/kubeprobes
+    binary: kubeprobes
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -15,6 +21,8 @@ builds:
     ignore:
       - goos: windows
         goarch: arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
 archives:
   - format: tar.gz
@@ -28,6 +36,14 @@ archives:
       - goos: windows
         format: zip
 
+release:
+  github:
+    owner: Tech-Preta
+    name: kubeprobes
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}}-v{{.Version}}"
+
 changelog:
   sort: asc
   filters:
@@ -36,4 +52,4 @@ changelog:
       - '^test:'
       - '^ci:'
       - Merge pull request
-      - Merge branch 
+      - Merge branch

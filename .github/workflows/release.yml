@@ -3,6 +3,7 @@ name: Release
 
 permissions:
   contents: write
+  packages: write
 
 'on':
   push:
@@ -22,6 +23,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24.5'
+          cache: true
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
