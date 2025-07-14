@@ -59,6 +59,28 @@ kubeprobes --help
 
 ## Uso
 
+### Auto-completion
+
+O kubeprobes suporta auto-completion para shells bash, zsh, fish e PowerShell. Para ativar:
+
+```bash
+# Bash
+source <(kubeprobes completion bash)
+
+# Zsh
+source <(kubeprobes completion zsh)
+
+# Fish
+kubeprobes completion fish | source
+
+# PowerShell
+kubeprobes completion powershell | Out-String | Invoke-Expression
+```
+
+Para configuração permanente, consulte a [documentação de completion](docs/completion.md).
+
+### Comandos Básicos
+
 ```bash
 # Verificar todos os tipos de probes no namespace padrão
 kubeprobes scan
@@ -82,6 +104,7 @@ kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <name
 
 ### Comandos Disponíveis
 - `scan`: Escaneia workloads do Kubernetes em busca de probes.
+- `completion`: Gera scripts de auto-completion para bash, zsh, fish e PowerShell.
 
 ### Flags
 - `-k, --kubeconfig`: Caminho para o arquivo kubeconfig.
