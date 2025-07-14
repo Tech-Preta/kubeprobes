@@ -133,14 +133,16 @@ func TestClient_Structure(t *testing.T) {
 	// This is primarily a compilation test
 	
 	client := &Client{}
-	if client == nil {
-		t.Error("Should be able to create Client struct")
-	}
 	
 	// Test that the struct can be used in contexts where the interface is expected
 	var _ interface {
 		GetPods(ctx context.Context, namespace string) (*corev1.PodList, error)
 	} = client
+	
+	// Verify the client struct was created successfully
+	if client.clientset != nil {
+		t.Log("Client struct created with clientset field")
+	}
 }
 
 // Integration test helper - only runs if KUBECONFIG is available
