@@ -90,6 +90,72 @@ kubeprobes scan -k <caminho-para-o-kubeconfig> -c <contexto-kubeconfig> -n <name
 - `-p, --probe-type`: Tipo de probe para escanear (liveness, readiness, startup).
 - `-r, --recommendation`: Mostrar recomendações para sondas ausentes.
 
+## Auto-completion
+
+O kubeprobes oferece suporte a auto-completion para bash, zsh, fish e PowerShell.
+
+> Para instruções detalhadas de instalação e configuração, consulte a [documentação de auto-completion](docs/completion.md).
+
+### Bash
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+source <(kubeprobes completion bash)
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+# Linux
+kubeprobes completion bash > /etc/bash_completion.d/kubeprobes
+
+# macOS
+kubeprobes completion bash > $(brew --prefix)/etc/bash_completion.d/kubeprobes
+```
+
+### Zsh
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+source <(kubeprobes completion zsh)
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+# Linux
+kubeprobes completion zsh > "${fpath[1]}/_kubeprobes"
+
+# macOS
+kubeprobes completion zsh > $(brew --prefix)/share/zsh/site-functions/_kubeprobes
+```
+
+### Fish
+
+Para carregar auto-completion na sua sessão atual:
+
+```bash
+kubeprobes completion fish | source
+```
+
+Para carregar auto-completion permanentemente:
+
+```bash
+kubeprobes completion fish > ~/.config/fish/completions/kubeprobes.fish
+```
+
+### PowerShell
+
+Para carregar auto-completion na sua sessão atual:
+
+```powershell
+kubeprobes completion powershell | Out-String | Invoke-Expression
+```
+
+Para carregar auto-completion permanentemente, adicione a saída do comando acima ao seu perfil do PowerShell.
+
 ## Segurança
 
 Este projeto segue as melhores práticas de segurança do OpenSSF. Para reportar uma vulnerabilidade, por favor consulte nosso [SECURITY.md](SECURITY.md).
