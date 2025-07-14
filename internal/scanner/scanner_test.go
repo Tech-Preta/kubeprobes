@@ -80,7 +80,7 @@ func TestNewProbeScanner_Validation(t *testing.T) {
 			}
 
 			// For valid probe types, we expect a kubernetes client error since we don't have a real cluster
-			if err != nil && !strings.Contains(err.Error(), "error creating kubernetes client") {
+			if err != nil && !strings.Contains(err.Error(), "failed to connect to Kubernetes cluster") {
 				t.Errorf("Unexpected error (expected kubernetes client error): %v", err)
 			}
 		})
@@ -135,7 +135,6 @@ func TestNewProbeScanner_EnhancedErrorMessages(t *testing.T) {
 			}
 		})
 	}
-		},
 }
 
 func TestNewProbeScannerWithClient(t *testing.T) {
@@ -262,8 +261,8 @@ func TestProbeScanner_Scan_GetPodsError(t *testing.T) {
 		return
 	}
 	
-	if !strings.Contains(err.Error(), "error listing pods") {
-		t.Errorf("Expected error to contain 'error listing pods', got %q", err.Error())
+	if !strings.Contains(err.Error(), "failed to retrieve pods from namespace") {
+		t.Errorf("Expected error to contain 'failed to retrieve pods from namespace', got %q", err.Error())
 	}
 }
 

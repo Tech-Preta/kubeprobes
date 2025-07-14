@@ -42,11 +42,11 @@ func TestNewScanCommand_Flags(t *testing.T) {
 		defaultValue interface{}
 		usage        string
 	}{
-		{"kubeconfig", "k", "", "path to the kubeconfig file"},
+		{"kubeconfig", "k", "", "Path to the kubeconfig file (defaults to $KUBECONFIG or ~/.kube/config)"},
 		{"kubeContext", "c", "", "Kubernetes context"},
-		{"namespace", "n", "default", "Kubernetes namespace (default: default)"},
-		{"probe-type", "p", "", "type of probe to scan for (liveness, readiness, startup)"},
-		{"recommendation", "r", false, "show recommendations for missing probes"},
+		{"namespace", "n", "default", "Kubernetes namespace to scan (default: default)"},
+		{"probe-type", "p", "", "Type of probe to scan for: liveness, readiness, or startup (default: all types)"},
+		{"recommendation", "r", false, "Show actionable recommendations for missing probes"},
 	}
 
 	for _, expected := range expectedFlags {
@@ -148,7 +148,7 @@ func TestNewScanCommand_FlagValidation(t *testing.T) {
 			name:        "invalid kubeconfig path",
 			args:        []string{"--kubeconfig=/nonexistent/path"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
 			name:        "invalid probe type shows enhanced error message",
@@ -160,25 +160,25 @@ func TestNewScanCommand_FlagValidation(t *testing.T) {
 			name:        "valid probe type liveness",
 			args:        []string{"--probe-type=liveness", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner", // Will fail on kubeconfig, not probe type
+			errorMsg:    "failed to connect to Kubernetes cluster", // Will fail on kubeconfig, not probe type
 		},
 		{
 			name:        "valid probe type readiness",
 			args:        []string{"--probe-type=readiness", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
 			name:        "valid probe type startup",
 			args:        []string{"--probe-type=startup", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 		{
 			name:        "case insensitive probe type",
 			args:        []string{"--probe-type=LIVENESS", "--kubeconfig=/nonexistent"},
 			expectError: true,
-			errorMsg:    "error creating scanner",
+			errorMsg:    "failed to connect to Kubernetes cluster",
 		},
 	}
 
@@ -339,5 +339,4 @@ func TestNewScanCommand_ExitCodes(t *testing.T) {
 	if !strings.Contains(cmd.Long, "1:") {
 		t.Error("Command should document exit code 1")
 	}
-}
 }

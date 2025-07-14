@@ -219,5 +219,4 @@ func TestVersionCommand_ErrorHandling(t *testing.T) {
 			}
 		})
 	}
-	}
 }
