@@ -65,5 +65,14 @@ Exit codes:
 	cmd.Flags().StringP("probe-type", "p", "", "type of probe to scan for (liveness, readiness, startup)")
 	cmd.Flags().BoolP("recommendation", "r", false, "show recommendations for missing probes")
 
+	// Add custom completion for probe-type flag
+	err := cmd.RegisterFlagCompletionFunc("probe-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"liveness", "readiness", "startup"}, cobra.ShellCompDirectiveNoFileComp
+	})
+	if err != nil {
+		// Log error but don't fail the command creation
+		fmt.Printf("Warning: failed to register completion for probe-type flag: %v\n", err)
+	}
+
 	return cmd
 }
