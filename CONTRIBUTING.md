@@ -14,16 +14,61 @@ Obrigado por considerar contribuir com o projeto! Este documento fornece diretri
 
 - Siga as [boas práticas de Go](https://golang.org/doc/effective_go)
 - Use `gofmt` para formatar seu código
-- Execute os testes antes de submeter (`go test ./...`)
-- Mantenha a cobertura de testes alta
+- Execute `go vet` para análise estática
+- Execute os linters com `make lint`
+- **Testes são obrigatórios** para novas funcionalidades e correções de bugs
+- Mantenha a cobertura de testes acima de 75%
+
+## Requisitos de Testes
+
+### Testes Obrigatórios
+
+Todas as contribuições devem incluir testes adequados:
+
+1. **Novas funcionalidades**: Devem ter testes unitários cobrindo cenários de sucesso, erro e casos extremos
+2. **Correções de bugs**: Devem incluir um teste que reproduza o bug e verifique a correção
+3. **Refatorações**: Devem manter ou melhorar a cobertura de testes existente
+
+### Executando Testes
+
+```bash
+# Executar todos os testes
+make test
+
+# Executar testes com cobertura
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+
+# Executar testes de um pacote específico
+go test -v ./internal/scanner/
+```
+
+### Padrões de Testes
+
+- Use **testes baseados em tabela** para múltiplos cenários
+- **Nomeie testes** de forma descritiva (ex: `TestScanner_InvalidProbeType`)
+- **Mock dependências externas** (ex: API do Kubernetes)
+- **Teste cenários de erro** além de casos de sucesso
+- **Mantenha testes rápidos** (< 1 segundo por teste)
 
 ## Processo de Pull Request
 
-1. Atualize a documentação se necessário
-2. Adicione testes para novas funcionalidades
-3. Certifique-se de que todos os testes passam
-4. Atualize o CHANGELOG.md
-5. Descreva suas mudanças no PR
+1. **Execute todos os testes** e certifique-se de que passam (`make test`)
+2. **Verifique a cobertura de testes** (`go test -coverprofile=coverage.out ./...`)
+3. Atualize a documentação se necessário
+4. **Adicione testes** para novas funcionalidades ou correções de bugs
+5. Execute o linter (`make lint`) e corrija quaisquer problemas
+6. Atualize o CHANGELOG.md
+7. Descreva suas mudanças no PR de forma clara e detalhada
+
+### Checklist do Pull Request
+
+- [ ] Testes adicionados/atualizados e passando
+- [ ] Cobertura de testes mantida/melhorada
+- [ ] Código formatado (`gofmt`)
+- [ ] Linter sem erros (`make lint`)
+- [ ] Documentação atualizada (se aplicável)
+- [ ] CHANGELOG.md atualizado
 
 ## Relatando Bugs
 
