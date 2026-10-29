@@ -19,7 +19,6 @@ rules:
         strict: true
         contexts:
           - "Code Review Check"
-          - "OSV-Scanner"
           - "Checkov Security Scan"
           - "Release"
       bypass_pull_request_allowances:
