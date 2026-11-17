@@ -44,6 +44,33 @@ release:
   prerelease: auto
   name_template: "{{.ProjectName}}-v{{.Version}}"
 
+dockers:
+  - image_templates:
+      - "ghcr.io/tech-preta/kubeprobes:{{ .Tag }}"
+      - "ghcr.io/tech-preta/kubeprobes:v{{ .Major }}"
+      - "ghcr.io/tech-preta/kubeprobes:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/tech-preta/kubeprobes:latest"
+    dockerfile: Dockerfile
+    build_contexts:
+      kubeprobes: "{{ .Path }}"
+    extra_files:
+      - go.mod
+      - go.sum
+      - cmd/
+      - internal/
+      - pkg/
+    use: buildx
+    build_flag_templates:
+      - "--platform={{ .Platform }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.description=Kubernetes health checks and probe analysis tool"
+      - "--label=org.opencontainers.image.url=https://github.com/Tech-Preta/kubeprobes"
+      - "--label=org.opencontainers.image.source=https://github.com/Tech-Preta/kubeprobes"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
 changelog:
   sort: asc
   filters:

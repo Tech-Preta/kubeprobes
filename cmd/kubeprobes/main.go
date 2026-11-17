@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"kubeprobes/internal/cli"
@@ -14,6 +13,7 @@ func main() {
 		if _, ok := err.(*scanner.ProbeIssuesFoundError); ok {
 			os.Exit(1)
 		}
-		log.Fatalf("Error executing command: %s", err.Error())
+		// The error has already been displayed by cobra, so just exit
+		os.Exit(1)
 	}
 }

@@ -1,30 +1,38 @@
 # Build stage
-FROM cgr.dev/chainguard/go:1.24 AS builder
+FROM golang:1.24-alpine AS builder
+
+# Install ca-certificates for HTTPS requests during build
+RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Copy go mod files
-COPY go.mod ./
-COPY go.sum ./
+# Copy go mod files to leverage layer caching
+COPY go.mod go.sum ./
 
-# Download dependencies and generate go.sum
-RUN go mod download && go mod tidy
+# Download dependencies
+RUN go mod download
 
-# Copy source code
+# Copy the rest of the source code
 COPY . .
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/kubeprobes ./cmd/kubeprobes
 
-# Final stage
-FROM cgr.dev/chainguard/static:20241227
+# Final stage - using alpine for better compatibility
+FROM alpine:3.22.0
 
-# Create a non-root user
-# Note: chainguard/static already includes a non-root user 'nonroot' with UID 65532
-USER 65532:65532
+# Install ca-certificates for HTTPS requests
+RUN apk --no-cache add ca-certificates
+
+# Create non-root user
+RUN addgroup -g 1001 -S kubeprobes && \
+    adduser -u 1001 -S kubeprobes -G kubeprobes
 
 # Copy the binary from builder
 COPY --from=builder /app/kubeprobes /usr/local/bin/kubeprobes
+
+# Set user
+USER kubeprobes:kubeprobes
 
 # Set the entrypoint
 ENTRYPOINT ["kubeprobes"]
